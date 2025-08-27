@@ -23,12 +23,12 @@ public class PDF {
     TableModel model = table.getModel();
     PdfPTable pdfTable = new PdfPTable(model.getColumnCount());
 
-    // Agregar encabezados
+
     for (int i = 0; i < model.getColumnCount(); i++) {
         pdfTable.addCell(new Phrase(model.getColumnName(i)));
     }
 
-    // Agregar filas
+
     for (int row = 0; row < model.getRowCount(); row++) {
         for (int col = 0; col < model.getColumnCount(); col++) {
             Object value = model.getValueAt(row, col);
