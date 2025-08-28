@@ -1,5 +1,6 @@
 package org.example;
 
+import com.formdev.flatlaf.FlatDarculaLaf;
 import org.example.domain_layer.Medico;
 import presentation_layer.Controllers.MedicoController;
 import presentation_layer.Models.MedicoTableModel;
@@ -8,6 +9,7 @@ import presentation_layer.Views.MedicoView.MedicoView;
 import service_layer.MedicoService;
 import service_layer.Service;
 import utilites.FileManagement;
+import com.formdev.flatlaf.FlatLightLaf;
 
 import javax.swing.*;
 import java.util.Dictionary;
@@ -15,6 +17,11 @@ import java.util.Hashtable;
 
 public class Main {
     public static void main(String[] args) {
+        try {
+            UIManager.setLookAndFeel(new FlatDarculaLaf());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
         /// Infraestructura de los medicos
         Service<Medico> medicoService = new MedicoService(FileManagement.getMedicosFileStore("medicos.xml"));
         MedicoController medicoController = new MedicoController(medicoService);
@@ -26,6 +33,7 @@ public class Main {
         /// Creacion de el mainTAB
         MainWindow window = new MainWindow();
         window.agregarTabs(tabs);
-        window.setVisible(true);
+        SwingUtilities.invokeLater(() -> {window.setVisible(true);});
+
     }
 }
