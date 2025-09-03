@@ -15,12 +15,17 @@ public class MainWindow extends JFrame {
         setSize(800, 600);
         setLocationRelativeTo(null);
     }
-    public void agregarTabs(Dictionary<String, JPanel> tabs){
+    public void agregarTabs(Dictionary<String, JPanel> tabs,Dictionary<String, JPanel> tabs2){
+        /// Agregacion de los tabs
         Enumeration<String> keys = tabs.keys();
-        while (keys.hasMoreElements()) {
+        Enumeration<String> keys2 = tabs2.keys();
+        while (keys.hasMoreElements()&&keys2.hasMoreElements()) {
             String titulo = keys.nextElement();
             JPanel contenido = tabs.get(titulo);
+            String titulo2 = keys2.nextElement();
+            JPanel contenido2 = tabs2.get(titulo2);
             MainTabPanel.addTab(titulo, contenido);
+            MainTabPanel.addTab(titulo2, contenido2);
         }
     }
 }

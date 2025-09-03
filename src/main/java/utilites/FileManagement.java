@@ -1,8 +1,10 @@
 package utilites;
 
 import com.sun.istack.NotNull;
+import org.example.data_access_layer.FarmaceutaFileStore;
 import org.example.data_access_layer.FileStore;
 import org.example.data_access_layer.MedicoFileStore;
+import org.example.domain_layer.Farmaceuta;
 import org.example.domain_layer.Medico;
 
 import java.io.File;
@@ -15,4 +17,10 @@ public class FileManagement {
         File medicosXml = new File(baseDir, fileName);
         return new MedicoFileStore(medicosXml);
     }
+    @NotNull
+    public static FileStore<Farmaceuta> getFarmaceutasFileStore(String fileName) {
+        File farmaceutasXml = new File(baseDir, fileName);
+        return new FarmaceutaFileStore(farmaceutasXml);
+    }
+
 }
