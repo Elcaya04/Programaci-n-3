@@ -1,5 +1,8 @@
 package service_layer;
 
+import org.example.domain_layer.Farmaceuta;
+import org.example.domain_layer.Medico;
+
 import java.util.List;
 
 public interface Service<T> {
@@ -9,5 +12,7 @@ public interface Service<T> {
     void actualizar(T entity);
     List<T> LeerTodo();
     T LeerID(String id);
+
     void Observer(ServiceObserver<T> listener);
+
 }

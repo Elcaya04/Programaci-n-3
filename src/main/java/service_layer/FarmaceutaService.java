@@ -84,7 +84,6 @@ public class FarmaceutaService implements Service<Farmaceuta> {
                 .findFirst()
                 .orElse(null);
     }
-
     @Override
     public void Observer(ServiceObserver<Farmaceuta> listener) {
         if(listener!=null) listeners.add(listener);
