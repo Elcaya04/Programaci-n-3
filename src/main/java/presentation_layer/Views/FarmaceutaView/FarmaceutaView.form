@@ -25,6 +25,7 @@
           <grid row="1" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <foreground color="-16777216"/>
           <text value="ID"/>
         </properties>
       </component>
@@ -68,6 +69,7 @@
           <grid row="4" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <foreground color="-16777216"/>
           <text value="Nombre"/>
         </properties>
       </component>
@@ -133,6 +135,7 @@
           <grid row="2" column="0" row-span="1" col-span="1" vsize-policy="0" hsize-policy="0" anchor="8" fill="0" indent="0" use-parent-layout="false"/>
         </constraints>
         <properties>
+          <foreground color="-16777216"/>
           <text value="Nombre"/>
         </properties>
       </component>

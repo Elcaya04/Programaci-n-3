@@ -7,6 +7,7 @@ import utilites.PDF;
 
 import javax.swing.*;
 import javax.swing.event.ListSelectionEvent;
+import java.awt.*;
 import java.util.List;
 
 public class MedicoView {
@@ -42,8 +43,27 @@ public class MedicoView {
         Motrar_Todos_Button.addActionListener(e -> mostrarTodos());
         Reporte_Button.addActionListener(e -> generarPDF());
         table1.getSelectionModel().addListSelectionListener(this::onTableSelection);
+        addHoverListener(Agregar_Button);
+        addHoverListener(Borrar_Button);
+        addHoverListener(Limpiar_Button);
+        addHoverListener(Motrar_Todos_Button);
+        addHoverListener(Reporte_Button);
+        addHoverListener(Buscar_Button);
     }
+    private void addHoverListener(JButton hover_Button) {
+        hover_Button.addMouseListener(new java.awt.event.MouseAdapter() {
+            @Override
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                hover_Button.setBackground(Color.LIGHT_GRAY);
+                hover_Button.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+            }
 
+            @Override
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                hover_Button.setBackground(UIManager.getColor("Button.background"));
+            }
+        });
+    }
     public void bind(MedicoController controller, MedicoTableModel model, List<Medico> medicos) {
         this.controller = controller;
         this.model = model;
