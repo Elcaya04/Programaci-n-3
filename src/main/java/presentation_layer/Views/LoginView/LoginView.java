@@ -2,6 +2,7 @@ package presentation_layer.Views.LoginView;
 
 import org.example.domain_layer.Farmaceuta;
 import org.example.domain_layer.Medico;
+import utilites.UserType;
 
 import service_layer.Service;
 
@@ -55,9 +56,10 @@ public class LoginView extends JFrame {
             return;
         }
 
-        TipoUsuario tipoUsuario = validarUsuario(usuario, contrasena);
 
-        if (tipoUsuario != TipoUsuario.INVALIDO) {
+        UserType tipoUsuario=validarUsuario(usuario,contrasena);
+
+        if (tipoUsuario != UserType.INVALIDO) {
             JOptionPane.showMessageDialog(this, "Bienvenido " + usuario);
             // Notificar al callback sobre el login exitoso
             loginCallback.onLoginSuccess(usuario, tipoUsuario);
@@ -67,25 +69,25 @@ public class LoginView extends JFrame {
         }
     }
 
-    private TipoUsuario validarUsuario(String usuario, String contrasena) {
+    private UserType validarUsuario(String usuario, String contrasena) {
         // Administrador fijo
         if (usuario.equalsIgnoreCase("administrador")) {
-            return contrasena.equals(passAdmin) ? TipoUsuario.ADMINISTRADOR : TipoUsuario.INVALIDO;
+            return contrasena.equals(passAdmin) ? UserType.ADMINISTRADOR : UserType.INVALIDO;
         }
 
         // Buscar Farmaceuta
         Farmaceuta farmaceuta = farmaceutaService.Buscar_porID(usuario);
         if (farmaceuta != null && contrasena.equals(farmaceuta.getClave())) {
-            return TipoUsuario.FARMACEUTA;
+            return UserType.FARMACEUTA;
         }
 
         // Buscar Medico
         Medico medico = medicoService.Buscar_porID(usuario);
         if (medico != null && contrasena.equals(medico.getClave())) {
-            return TipoUsuario.MEDICO;
+            return UserType.MEDICO;
         }
 
-        return TipoUsuario.INVALIDO;
+        return UserType.INVALIDO;
     }
 
     private void onLimpiar() {
@@ -100,7 +102,7 @@ public class LoginView extends JFrame {
         String actual = JOptionPane.showInputDialog(this, "Ingrese la contraseña actual:");
         if (actual == null || actual.isEmpty()) return;
 
-        if (validarUsuario(usuario, actual) != TipoUsuario.INVALIDO) {
+        if (validarUsuario(usuario, actual) != UserType.INVALIDO) {
             String nueva = JOptionPane.showInputDialog(this, "Ingrese la nueva contraseña:");
             if (nueva == null || nueva.isEmpty()) {
                 JOptionPane.showMessageDialog(this, "Contraseña no puede estar vacía");
@@ -145,14 +147,7 @@ public class LoginView extends JFrame {
 
     // Interfaz para el callback
     public interface LoginCallback {
-        void onLoginSuccess(String usuario, TipoUsuario tipoUsuario);
+        void onLoginSuccess(String usuario, UserType tipoUsuario);
     }
 
-    // Enum para tipos de usuario
-    public enum TipoUsuario {
-        ADMINISTRADOR,
-        MEDICO,
-        FARMACEUTA,
-        INVALIDO
-    }
 }

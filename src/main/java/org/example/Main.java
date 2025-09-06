@@ -20,6 +20,7 @@ import service_layer.MedicoService;
 import service_layer.PacienteService;
 import service_layer.Service;
 import utilites.FileManagement;
+import utilites.UserType;
 
 import javax.swing.*;
 import java.util.Dictionary;
@@ -122,7 +123,7 @@ public class Main {
                     medicoService,
                     new LoginView.LoginCallback() {
                         @Override
-                        public void onLoginSuccess(String usuario, LoginView.TipoUsuario tipoUsuario) {
+                        public void onLoginSuccess(String usuario, UserType tipoUsuario) {
                             // Configurar la ventana principal según el tipo de usuario
                             configurarInterfazSegunUsuario(usuario, tipoUsuario);
                             mainWindow.setVisible(true);
@@ -133,7 +134,7 @@ public class Main {
         });
     }
 
-    private static void configurarInterfazSegunUsuario(String usuario, LoginView.TipoUsuario tipoUsuario) {
+    private static void configurarInterfazSegunUsuario(String usuario, UserType tipoUsuario) {
         // Configurar título con el usuario
         mainWindow.setTitle("Sistema de Gestión - Usuario: " + usuario);
 
