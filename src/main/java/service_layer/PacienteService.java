@@ -3,6 +3,7 @@ package service_layer;
 import org.example.data_access_layer.FileStore;
 
 
+import org.example.domain_layer.Farmaceuta;
 import org.example.domain_layer.Medico;
 import org.example.domain_layer.Paciente;
 import utilites.ChangeType;
@@ -90,6 +91,17 @@ public class PacienteService implements Service<Paciente> {
     public void Observer(ServiceObserver<Paciente> listener) {
         if(listener!=null) listeners.add(listener);
     }
+
+    @Override
+    public Farmaceuta Buscar_porID(String id) {
+        return null;
+    }
+
+    @Override
+    public Medico Buscar_porID_M(String id) {
+        return null;
+    }
+
     private void notifyObservers(ChangeType type, Paciente entity) {
         for (ServiceObserver<Paciente> l : listeners) l.DataChanged(type, entity);
     }

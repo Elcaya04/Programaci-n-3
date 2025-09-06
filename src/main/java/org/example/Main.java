@@ -25,13 +25,9 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class Main {
-    private static Farmaceuta far;
-    private static Medico med;
     private static MedicoView medicoView;
     private static FarmaceutaView farmaceutaView;
     private static PacienteView pacienteView;
-    private final FarmaceutaService farmaceutaService_f;
-    private final MedicoService medicoService_m;
 
     private static Dictionary<String, JPanel> tabs;
     private static Dictionary<String, JPanel> tabs2;
