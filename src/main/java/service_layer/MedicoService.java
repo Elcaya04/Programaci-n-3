@@ -60,7 +60,7 @@ public class MedicoService implements Service<Medico> {
     public void actualizar(Medico entity) {
         List<Medico> medicos = fileStore.Leer();
         for (int i = 0; i < medicos.size(); i++) {
-            if (medicos.get(i).getID() == entity.getID()) {
+            if (medicos.get(i).getID().equals(entity.getID())) {
                 medicos.set(i, entity);
                 break;
             }
@@ -78,7 +78,7 @@ public class MedicoService implements Service<Medico> {
     public Medico LeerID(String id) {
         return fileStore.Leer()
                 .stream()
-                .filter(c -> c.getID() == id)
+                .filter(c -> c.getID().equals(id))
                 .findFirst()
                 .orElse(null);
     }
@@ -89,28 +89,24 @@ if(listener!=null) listeners.add(listener);
     }
 
     @Override
-    public Farmaceuta Buscar_porID(String id) {
-        return null;
-    }
-
-    @Override
-    public Medico Buscar_porID_M(String id) {
+    public Medico Buscar_porID(String id) {
         List<Medico> medicos = fileStore.Leer();
         Medico medico = null;
-        for(int i=0;i<medicos.size();i++){
-            if(medicos.get(i).getNombre().equals(id)){
-                medico=medicos.get(i);
+        for(int i = 0; i < medicos.size(); i++){
+            if(medicos.get(i).getID().equals(id)){
+                medico = medicos.get(i);
                 break;
             }
         }
-        if(medico!=null) {
+        if(medico != null) {
             notifyObservers(ChangeType.SEARCH, medico);
         }
         else {
-            notifyObservers(ChangeType.NOT_FOUND,null);
+            notifyObservers(ChangeType.NOT_FOUND, null);
         }
         return medico;
     }
+
 
     private void notifyObservers(ChangeType type, Medico entity) {
         for (ServiceObserver<Medico> l : listeners) l.DataChanged(type, entity);

@@ -11,6 +11,7 @@ import presentation_layer.Models.FarmaceutaTableModel;
 import presentation_layer.Models.MedicoTableModel;
 import presentation_layer.Models.PacienteTableModel;
 import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
+import presentation_layer.Views.MainWindow.MainWindow;
 import presentation_layer.Views.MedicoView.MedicoView;
 import presentation_layer.Views.PacienteView.PacienteView;
 import presentation_layer.Views.LoginView.LoginView;
@@ -25,61 +26,164 @@ import java.util.Dictionary;
 import java.util.Hashtable;
 
 public class Main {
+    // Servicios globales
+    private static Service<Medico> medicoService;
+    private static Service<Farmaceuta> farmaceutaService;
+    private static Service<Paciente> pacienteService;
+
+    // Vistas globales
     private static MedicoView medicoView;
     private static FarmaceutaView farmaceutaView;
     private static PacienteView pacienteView;
+    private static MainWindow mainWindow;
 
+    // Diccionarios de tabs (manteniendo la estructura original)
     private static Dictionary<String, JPanel> tabs;
     private static Dictionary<String, JPanel> tabs2;
     private static Dictionary<String, JPanel> tabs3;
 
-
     public static void main(String[] args) {
+        configurarLookAndFeel();
+        inicializarServicios();
+        inicializarVistas();
+        mostrarLogin();
+    }
+
+    private static void configurarLookAndFeel() {
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
 
+    private static void inicializarServicios() {
+        // Inicializar servicio de médicos
+        medicoService = new MedicoService(
+                FileManagement.getMedicosFileStore("medicos.xml")
+        );
+
+        // Inicializar servicio de farmaceutas
+        farmaceutaService = new FarmaceutaService(
+                FileManagement.getFarmaceutasFileStore("farmaceuticos.xml")
+        );
+
+        // Inicializar servicio de pacientes
+        pacienteService = new PacienteService(
+                FileManagement.getPacientesFileStore("pacientes.xml")
+        );
+    }
+
+    private static void inicializarVistas() {
         // Infraestructura medico
-        Service<Medico> medicoService =
-                new MedicoService(FileManagement.getMedicosFileStore("medicos.xml"));
         MedicoController medicoController = new MedicoController(medicoService);
         MedicoTableModel medicoTableModel = new MedicoTableModel();
-        medicoView = new MedicoView(medicoController, medicoTableModel, medicoController.leerTodos());
+        medicoView = new MedicoView(
+                medicoController,
+                medicoTableModel,
+                medicoController.leerTodos()
+        );
         medicoService.Observer(medicoTableModel);
         tabs = new Hashtable<>();
         tabs.put("Medico", medicoView.getContentPanel());
 
         // Infraestructura farmaceuta
-        Service<Farmaceuta> farmaceutaService =
-                new FarmaceutaService(FileManagement.getFarmaceutasFileStore("farmaceuticos.xml"));
         FarmaceutaController farmaceutaController = new FarmaceutaController(farmaceutaService);
         FarmaceutaTableModel farmaceutaTableModel = new FarmaceutaTableModel();
-        farmaceutaView = new FarmaceutaView(farmaceutaController, farmaceutaTableModel, farmaceutaController.leerTodos());
+        farmaceutaView = new FarmaceutaView(
+                farmaceutaController,
+                farmaceutaTableModel,
+                farmaceutaController.leerTodos()
+        );
         farmaceutaService.Observer(farmaceutaTableModel);
         tabs2 = new Hashtable<>();
         tabs2.put("Farmaceuta", farmaceutaView.getContentPanel());
 
         // Infraestructura paciente
-        Service<Paciente> pacienteService =
-                new PacienteService(FileManagement.getPacientesFileStore("pacientes.xml"));
         PacienteController pacienteController = new PacienteController(pacienteService);
         PacienteTableModel pacienteTableModel = new PacienteTableModel();
-        pacienteView = new PacienteView(pacienteController, pacienteTableModel, pacienteController.leerTodos());
+        pacienteView = new PacienteView(
+                pacienteController,
+                pacienteTableModel,
+                pacienteController.leerTodos()
+        );
         pacienteService.Observer(pacienteTableModel);
         tabs3 = new Hashtable<>();
         tabs3.put("Paciente", pacienteView.getContentPanel());
 
-        // Mostrar Login primero
-        SwingUtilities.invokeLater(() -> new LoginView().setVisible(true));
+        // Inicializar ventana principal
+        mainWindow = new MainWindow();
     }
 
-    public static MedicoView getMedicoView() { return medicoView; }
-    public static FarmaceutaView getFarmaceutaView() { return farmaceutaView; }
-    public static PacienteView getPacienteView() { return pacienteView; }
+    private static void mostrarLogin() {
+        SwingUtilities.invokeLater(() -> {
+            LoginView loginView = new LoginView(
+                    farmaceutaService,
+                    medicoService,
+                    new LoginView.LoginCallback() {
+                        @Override
+                        public void onLoginSuccess(String usuario, LoginView.TipoUsuario tipoUsuario) {
+                            // Configurar la ventana principal según el tipo de usuario
+                            configurarInterfazSegunUsuario(usuario, tipoUsuario);
+                            mainWindow.setVisible(true);
+                        }
+                    }
+            );
+            loginView.setVisible(true);
+        });
+    }
 
-    public static Dictionary<String, JPanel> getTabs() { return tabs; }
-    public static Dictionary<String, JPanel> getTabs2() { return tabs2; }
-    public static Dictionary<String, JPanel> getTabs3() { return tabs3; }
+    private static void configurarInterfazSegunUsuario(String usuario, LoginView.TipoUsuario tipoUsuario) {
+        // Configurar título con el usuario
+        mainWindow.setTitle("Sistema de Gestión - Usuario: " + usuario);
+
+        switch (tipoUsuario) {
+            case ADMINISTRADOR:
+                // El administrador puede ver todos los tabs
+                mainWindow.agregarTabs(tabs, tabs2, tabs3);
+                break;
+
+            case MEDICO:
+                // Los médicos pueden ver médicos y pacientes
+                Dictionary<String, JPanel> tabsVacios = new Hashtable<>();
+                mainWindow.agregarTabs(tabs, tabsVacios, tabs3);
+                break;
+
+            case FARMACEUTA:
+                // Los farmaceutas pueden ver farmaceutas y pacientes
+                Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
+                mainWindow.agregarTabs(tabsVacios2, tabs2, tabs3);
+                break;
+
+            default:
+                JOptionPane.showMessageDialog(mainWindow, "Tipo de usuario no reconocido");
+                break;
+        }
+    }
+
+    // Métodos de utilidad para acceder a los servicios desde otras clases si es necesario
+    public static Service<Medico> getMedicoService() {
+        return medicoService;
+    }
+
+    public static Service<Farmaceuta> getFarmaceutaService() {
+        return farmaceutaService;
+    }
+
+    public static Service<Paciente> getPacienteService() {
+        return pacienteService;
+    }
+
+    // Métodos de utilidad para acceder a los diccionarios de tabs si es necesario
+    public static Dictionary<String, JPanel> getTabs() {
+        return tabs;
+    }
+
+    public static Dictionary<String, JPanel> getTabs2() {
+        return tabs2;
+    }
+
+    public static Dictionary<String, JPanel> getTabs3() {
+        return tabs3;
+    }
 }

@@ -1,1 +1,1 @@
-<?xml version="1.0" encoding="UTF-8"?><medicos><medico><id>MED-237</id><nombre>Gerson</nombre><especialidad>Musico</especialidad></medico><medico><id>MED-094</id><nombre>Jose</nombre><especialidad>Cardiologo</especialidad></medico></medicos>
+<?xml version="1.0" encoding="UTF-8"?><medicos><medico><id>MED-01</id><nombre>Gerson</nombre><especialidad>Oncologia</especialidad><clave>1234</clave></medico></medicos>

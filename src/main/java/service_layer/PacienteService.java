@@ -93,14 +93,11 @@ public class PacienteService implements Service<Paciente> {
     }
 
     @Override
-    public Farmaceuta Buscar_porID(String id) {
+    public Paciente Buscar_porID(String id) {
         return null;
     }
 
-    @Override
-    public Medico Buscar_porID_M(String id) {
-        return null;
-    }
+
 
     private void notifyObservers(ChangeType type, Paciente entity) {
         for (ServiceObserver<Paciente> l : listeners) l.DataChanged(type, entity);

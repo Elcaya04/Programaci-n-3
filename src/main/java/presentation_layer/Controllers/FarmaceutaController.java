@@ -3,6 +3,7 @@ package presentation_layer.Controllers;
 import org.example.domain_layer.Farmaceuta;
 
 import service_layer.Service;
+import utilites.ChangeType;
 
 import java.util.List;
 
@@ -26,6 +27,7 @@ public class FarmaceutaController {
         validarId(id);
         service.eliminar(id);
     }
+
     public void Buscar(String nombre) {
         validarNombre(nombre);
         service.buscar(nombre);

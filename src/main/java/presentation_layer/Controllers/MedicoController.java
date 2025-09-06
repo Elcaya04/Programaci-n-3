@@ -1,5 +1,6 @@
 package presentation_layer.Controllers;
 
+import org.example.domain_layer.Farmaceuta;
 import org.example.domain_layer.Medico;
 import service_layer.Service;
 
@@ -11,9 +12,11 @@ public class MedicoController {
         this.service = service;
     }
     public void agregar(String id, String nombre, String especialidad, String clave) {
-        validarId(id);
+        String x;
+        x=id;
+        clave=id;
         validarNombre(nombre);
-        Medico c = new Medico(id, nombre, especialidad,clave);
+        Medico c = new Medico(x, nombre, especialidad,clave);
         service.agregar(c);
     }
     public List<Medico> leerTodos() {

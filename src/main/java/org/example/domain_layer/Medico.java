@@ -27,7 +27,7 @@ public class Medico {
         this.ID = ID;
         this.Nombre = Nombre;
         this.Especialidad = Especialidad;
-        this.Clave = Clave;
+        this.Clave = ID;
     }
     public String getID() {
         return ID;

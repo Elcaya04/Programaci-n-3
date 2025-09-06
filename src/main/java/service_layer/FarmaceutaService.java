@@ -94,24 +94,19 @@ public class FarmaceutaService implements Service<Farmaceuta> {
     public Farmaceuta Buscar_porID(String id) {
         List<Farmaceuta> farmaceutas = fileStore.Leer();
         Farmaceuta farmaceuta = null;
-        for(int i=0;i<farmaceutas.size();i++){
-            if(farmaceutas.get(i).getNombre().equals(id)){
-                farmaceuta=farmaceutas.get(i);
+        for(int i = 0; i < farmaceutas.size(); i++){
+            if(farmaceutas.get(i).getID().equals(id)){  // Cambio aquí: getID() en lugar de getNombre()
+                farmaceuta = farmaceutas.get(i);
                 break;
             }
         }
-        if(farmaceuta!=null) {
+        if(farmaceuta != null) {
             notifyObservers(ChangeType.SEARCH, farmaceuta);
         }
         else {
-            notifyObservers(ChangeType.NOT_FOUND,null);
+            notifyObservers(ChangeType.NOT_FOUND, null);
         }
         return farmaceuta;
-    }
-
-    @Override
-    public Medico Buscar_porID_M(String id) {
-        return null;
     }
 
     private void notifyObservers(ChangeType type,Farmaceuta entity) {
