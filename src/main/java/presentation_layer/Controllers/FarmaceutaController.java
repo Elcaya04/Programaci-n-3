@@ -12,9 +12,11 @@ public class FarmaceutaController {
         this.service = service;
     }
     public void agregar(String id,String clave, String nombre) {
-        validarId(id);
+        String x;
+        x=id;
+        clave=id;
         validarNombre(nombre);
-        Farmaceuta c = new Farmaceuta(id, clave, nombre);
+        Farmaceuta c = new Farmaceuta(x, clave, nombre);
         service.agregar(c);
     }
     public List<Farmaceuta> leerTodos() {

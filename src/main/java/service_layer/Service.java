@@ -15,4 +15,6 @@ public interface Service<T> {
 
     void Observer(ServiceObserver<T> listener);
 
+    Farmaceuta Buscar_porID(String id);
+    Medico Buscar_porID_M(String id);
 }

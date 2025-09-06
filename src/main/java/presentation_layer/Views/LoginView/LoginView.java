@@ -1,7 +1,16 @@
 package presentation_layer.Views.LoginView;
 
 import org.example.Main;
+import org.example.data_access_layer.FarmaceutaFileStore;
+import org.example.domain_layer.Farmaceuta;
+import org.example.domain_layer.Medico;
+import org.example.domain_layer.Paciente;
+import org.glassfish.jaxb.core.v2.model.core.ID;
+import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
 import presentation_layer.Views.MainWindow.MainWindow;
+import presentation_layer.Views.MedicoView.MedicoView;
+import service_layer.FarmaceutaService;
+import service_layer.MedicoService;
 
 import javax.swing.*;
 
@@ -14,10 +23,8 @@ public class LoginView extends JFrame {
     private JButton Cambio_ContraseñaButton;
     private JPasswordField Contraseña_Texto;
 
+
     // contraseñas iniciales
-    private static String passMedico = "medico";
-    private static String passPaciente = "paciente";
-    private static String passFarmaceutica = "farmaceutica";
     private static String passAdmin = "administrador";
 
     public LoginView() {
@@ -36,12 +43,14 @@ public class LoginView extends JFrame {
         String usuario = ID_Texto.getText().trim();
         String contrasena = new String(Contraseña_Texto.getPassword()).trim();
 
+
+
         if (usuario.isEmpty() || contrasena.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Debe ingresar usuario y contraseña");
             return;
         }
 
-        if (validarUsuario(usuario, contrasena)) {
+        if (validarUsuario(usuario,contrasena)) {
             JOptionPane.showMessageDialog(this, "Bienvenido " + usuario);
             SwingUtilities.invokeLater(() -> abrirVista(usuario));
             dispose(); // cerrar login
@@ -51,52 +60,76 @@ public class LoginView extends JFrame {
     }
 
     private boolean validarUsuario(String usuario, String contrasena) {
-        switch (usuario.toLowerCase()) {
-            case "medico": return contrasena.equals(passMedico);
-            case "paciente": return contrasena.equals(passPaciente);
-            case "farmaceutica": return contrasena.equals(passFarmaceutica);
-            case "administrador": return contrasena.equals(passAdmin);
-            default: return false;
+        // Administrador fijo
+        if (usuario.equalsIgnoreCase("administrador")) {
+            return contrasena.equals(passAdmin);
         }
-    }
+
+        // Buscar Farmaceuta
+        Farmaceuta far = Main.getFarmaceutaView().getController().Buscar_porID(usuario);
+        if (far != null && contrasena.equals(far.getID())) {
+            return true;
+        }
+        // Buscar Medico
+        Medico med = Main.getMedicoView().getController().Buscar_porID_M(usuario);
+        if (med != null && contrasena.equals(med.getID())) {
+            return true;
+        }
+        return false;
+        }
+
     private void abrirVista(String usuario) {
-        switch (usuario.toLowerCase()) {
-            case "medico":
-                new JFrame("Medicos") {{
-                    setContentPane(Main.getMedicoView().getContentPanel());
-                    setSize(800, 600);
-                    setDefaultCloseOperation(EXIT_ON_CLOSE);
-                    setVisible(true);
-                }};
-                break;
-
-            case "farmaceutica":
-                new JFrame("Farmaceutas") {{
-                    setContentPane(Main.getFarmaceutaView().getContentPanel());
-                    setSize(800, 600);
-                    setDefaultCloseOperation(EXIT_ON_CLOSE);
-                    setVisible(true);
-                }};
-                break;
-
-            case "paciente":
-                new JFrame("Pacientes") {{
-                    setContentPane(Main.getPacienteView().getContentPanel());
-                    setSize(800, 600);
-                    setDefaultCloseOperation(EXIT_ON_CLOSE);
-                    setVisible(true);
-                }};
-                break;
-
-            case "administrador":
-                MainWindow window = new MainWindow();
-                window.agregarTabs(Main.getTabs(), Main.getTabs2(), Main.getTabs3());
-                window.setVisible(true);
-                break;
-
-            default:
-                JOptionPane.showMessageDialog(this, "No hay vista para este usuario");
+        // Farmaceuta
+        Farmaceuta far = Main.getFarmaceutaView().getController().Buscar_porID(usuario);
+        if (far != null && usuario.equals(far.getID())) {
+            new JFrame("Farmaceutas") {{
+                setContentPane(Main.getFarmaceutaView().getContentPanel());
+                setSize(800, 600);
+                setDefaultCloseOperation(EXIT_ON_CLOSE);
+                setVisible(true);
+            }};
+            return;
         }
+
+        // Médico
+        Medico medico = Main.getMedicoView().getController().Buscar_porID_M(usuario);
+        if (medico != null && usuario.equals(medico.getID())) {
+            new JFrame("Medicos") {{
+                setContentPane(Main.getMedicoView().getContentPanel());
+                setSize(800, 600);
+                setDefaultCloseOperation(EXIT_ON_CLOSE);
+                setVisible(true);
+            }};
+            return;
+        }
+
+        // Administrador
+        if (usuario.equalsIgnoreCase("administrador")) {
+            MainWindow window = new MainWindow();
+            window.agregarTabs(Main.getTabs(), Main.getTabs2(), Main.getTabs3());
+            window.setVisible(true);
+        }
+
+             if(usuario.equalsIgnoreCase("paciente")) {
+            new JFrame("Pacientes") {{
+                setContentPane(Main.getPacienteView().getContentPanel());
+                setSize(800, 600);
+                setDefaultCloseOperation(EXIT_ON_CLOSE);
+                setVisible(true);
+            }};
+            return;
+        }
+
+
+            if(usuario.equalsIgnoreCase("administrador")){
+
+            MainWindow window = new MainWindow();
+            window.agregarTabs(Main.getTabs(), Main.getTabs2(), Main.getTabs3());
+            window.setVisible(true);
+
+
+        }
+
     }
 
     private void onLimpiar() {
@@ -118,11 +151,22 @@ public class LoginView extends JFrame {
                 return;
             }
 
-            switch (usuario.toLowerCase()) {
-                case "medico": passMedico = nueva; break;
-                case "paciente": passPaciente = nueva; break;
-                case "farmaceutica": passFarmaceutica = nueva; break;
-                case "administrador": passAdmin = nueva; break;
+            if (usuario.equalsIgnoreCase("administrador")) {
+                passAdmin = nueva;
+            } else {
+                // Buscar farmaceuta
+                Farmaceuta farmaceuta = Far.Buscar_porID(usuario);
+                if (farmaceuta != null) {
+                    farmaceuta.setClave(nueva);
+                    Far.actualizar(farmaceuta);
+                }
+
+                // Buscar médico
+                Medico medico = Med.Buscar_porID_M(usuario);
+                if (medico != null) {
+                    medico.setClave(nueva);
+                    Med.actualizar(medico);
+                }
             }
 
             JOptionPane.showMessageDialog(this, "Contraseña cambiada exitosamente");

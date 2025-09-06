@@ -1,6 +1,7 @@
 package service_layer;
 
 import org.example.data_access_layer.FileStore;
+import org.example.domain_layer.Farmaceuta;
 import org.example.domain_layer.Medico;
 import utilites.ChangeType;
 
@@ -86,6 +87,31 @@ public class MedicoService implements Service<Medico> {
     public void Observer(ServiceObserver<Medico> listener) {
 if(listener!=null) listeners.add(listener);
     }
+
+    @Override
+    public Farmaceuta Buscar_porID(String id) {
+        return null;
+    }
+
+    @Override
+    public Medico Buscar_porID_M(String id) {
+        List<Medico> medicos = fileStore.Leer();
+        Medico medico = null;
+        for(int i=0;i<medicos.size();i++){
+            if(medicos.get(i).getNombre().equals(id)){
+                medico=medicos.get(i);
+                break;
+            }
+        }
+        if(medico!=null) {
+            notifyObservers(ChangeType.SEARCH, medico);
+        }
+        else {
+            notifyObservers(ChangeType.NOT_FOUND,null);
+        }
+        return medico;
+    }
+
     private void notifyObservers(ChangeType type, Medico entity) {
         for (ServiceObserver<Medico> l : listeners) l.DataChanged(type, entity);
     }

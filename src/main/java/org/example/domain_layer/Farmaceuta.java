@@ -17,7 +17,7 @@ public class Farmaceuta {
     public Farmaceuta() {}
     public Farmaceuta(String ID, String Clave,String Nombre) {
         this.ID = ID;
-        this.Clave = Clave;
+        this.Clave = ID;
         this.Nombre = Nombre;
     }
     public String getID() {
@@ -30,7 +30,7 @@ public class Farmaceuta {
         return Clave;
     }
     public void setClave(String Clave) {
-        this.Clave = Clave;
+        this.Clave =Clave;
     }
     public String getNombre() {
         return Nombre;

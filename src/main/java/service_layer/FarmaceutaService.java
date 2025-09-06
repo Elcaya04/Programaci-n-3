@@ -84,10 +84,36 @@ public class FarmaceutaService implements Service<Farmaceuta> {
                 .findFirst()
                 .orElse(null);
     }
+
     @Override
     public void Observer(ServiceObserver<Farmaceuta> listener) {
         if(listener!=null) listeners.add(listener);
     }
+
+    @Override
+    public Farmaceuta Buscar_porID(String id) {
+        List<Farmaceuta> farmaceutas = fileStore.Leer();
+        Farmaceuta farmaceuta = null;
+        for(int i=0;i<farmaceutas.size();i++){
+            if(farmaceutas.get(i).getNombre().equals(id)){
+                farmaceuta=farmaceutas.get(i);
+                break;
+            }
+        }
+        if(farmaceuta!=null) {
+            notifyObservers(ChangeType.SEARCH, farmaceuta);
+        }
+        else {
+            notifyObservers(ChangeType.NOT_FOUND,null);
+        }
+        return farmaceuta;
+    }
+
+    @Override
+    public Medico Buscar_porID_M(String id) {
+        return null;
+    }
+
     private void notifyObservers(ChangeType type,Farmaceuta entity) {
         for (ServiceObserver<Farmaceuta> l : listeners) l.DataChanged(type, entity);
     }
