@@ -2,23 +2,24 @@ package org.example;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import org.example.domain_layer.Farmaceuta;
+import org.example.domain_layer.Medicamentos;
 import org.example.domain_layer.Medico;
 import org.example.domain_layer.Paciente;
 import presentation_layer.Controllers.FarmaceutaController;
+import presentation_layer.Controllers.MedicamentosController;
 import presentation_layer.Controllers.MedicoController;
 import presentation_layer.Controllers.PacienteController;
 import presentation_layer.Models.FarmaceutaTableModel;
+import presentation_layer.Models.MedicamentoTableModel;
 import presentation_layer.Models.MedicoTableModel;
 import presentation_layer.Models.PacienteTableModel;
 import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
 import presentation_layer.Views.MainWindow.MainWindow;
+import presentation_layer.Views.MedicamentosView.MedicamentosView;
 import presentation_layer.Views.MedicoView.MedicoView;
 import presentation_layer.Views.PacienteView.PacienteView;
 import presentation_layer.Views.LoginView.LoginView;
-import service_layer.FarmaceutaService;
-import service_layer.MedicoService;
-import service_layer.PacienteService;
-import service_layer.Service;
+import service_layer.*;
 import utilites.FileManagement;
 import utilites.UserType;
 
@@ -31,17 +32,20 @@ public class Main {
     private static Service<Medico> medicoService;
     private static Service<Farmaceuta> farmaceutaService;
     private static Service<Paciente> pacienteService;
+    private static Service<Medicamentos> medicamentosService;
 
     // Vistas globales
     private static MedicoView medicoView;
     private static FarmaceutaView farmaceutaView;
     private static PacienteView pacienteView;
+    private static MedicamentosView  medicamentosView;
     private static MainWindow mainWindow;
 
     // Diccionarios de tabs (manteniendo la estructura original)
     private static Dictionary<String, JPanel> tabs;
     private static Dictionary<String, JPanel> tabs2;
     private static Dictionary<String, JPanel> tabs3;
+    private static Dictionary<String, JPanel> tabs4;
 
     public static void main(String[] args) {
         configurarLookAndFeel();
@@ -73,6 +77,7 @@ public class Main {
         pacienteService = new PacienteService(
                 FileManagement.getPacientesFileStore("pacientes.xml")
         );
+        medicamentosService = new MedicamentoService(FileManagement.getMedicamentosFileStore("medicamentos.xml"));
     }
 
     private static void inicializarVistas() {
@@ -111,6 +116,13 @@ public class Main {
         pacienteService.Observer(pacienteTableModel);
         tabs3 = new Hashtable<>();
         tabs3.put("Paciente", pacienteView.getContentPanel());
+        //Infraestructura de Medicamentos
+        MedicamentosController medicamentosController = new MedicamentosController(medicamentosService);
+        MedicamentoTableModel medicamentoTableModel = new MedicamentoTableModel();
+        medicamentosView = new MedicamentosView(medicamentosController,medicamentoTableModel,medicamentosController.leerTodos());
+        medicamentosService.Observer(medicamentoTableModel);
+        tabs4 = new Hashtable<>();
+        tabs4.put("Medicamento", medicamentosView.getContentPanel());
 
         // Inicializar ventana principal
         mainWindow = new MainWindow();
@@ -146,8 +158,8 @@ public class Main {
 
             case MEDICO:
                 // Los médicos pueden ver médicos y pacientes
-                Dictionary<String, JPanel> tabsVacios = new Hashtable<>();
-                mainWindow.agregarTabs(tabs, tabsVacios, tabs3);
+
+                mainWindow.agregarTabs(tabs, tabs4, tabs3);
                 break;
 
             case FARMACEUTA:
