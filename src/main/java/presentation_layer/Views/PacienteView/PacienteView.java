@@ -148,6 +148,13 @@ public class PacienteView {
             Numero_Telefono_Texto.setText("");
             ID_Texto.requestFocus();
         }
+    public Paciente getPacienteSeleccionado() {
+        int row = table1.getSelectedRow();
+        if (row >= 0) {
+            return model.getAt(row);
+        }
+        return null;
+    }
 
         private void onTableSelection(ListSelectionEvent e) {
             if (e.getValueIsAdjusting()) return;
@@ -186,7 +193,7 @@ public class PacienteView {
 
         private void requireBound() {
             if (controller == null || model == null)
-                throw new IllegalStateException("Medico no está enlazado (bind) a controller/model.");
+                throw new IllegalStateException("Paciente no está enlazado (bind) a controller/model.");
         }
 
         private String safe(String s) { return s == null ? "" : s.trim(); }

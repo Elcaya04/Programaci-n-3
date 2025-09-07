@@ -172,6 +172,13 @@ private void Buscar() {
         String presentacion;
 
     }
+    public Medicamentos getMedicamentoSeleccionado() {
+        int row = table1.getSelectedRow();
+        if (row >= 0) {
+            return model.getAt(row);
+        }
+        return null;
+    }
 
     private DatosForm readForm() {
         DatosForm d = new DatosForm();

@@ -1,24 +1,17 @@
 package org.example;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
-import org.example.domain_layer.Farmaceuta;
-import org.example.domain_layer.Medicamentos;
-import org.example.domain_layer.Medico;
-import org.example.domain_layer.Paciente;
-import presentation_layer.Controllers.FarmaceutaController;
-import presentation_layer.Controllers.MedicamentosController;
-import presentation_layer.Controllers.MedicoController;
-import presentation_layer.Controllers.PacienteController;
-import presentation_layer.Models.FarmaceutaTableModel;
-import presentation_layer.Models.MedicamentoTableModel;
-import presentation_layer.Models.MedicoTableModel;
-import presentation_layer.Models.PacienteTableModel;
+import org.example.domain_layer.*;
+import presentation_layer.Controllers.*;
+import presentation_layer.Models.*;
 import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
 import presentation_layer.Views.MainWindow.MainWindow;
 import presentation_layer.Views.MedicamentosView.MedicamentosView;
 import presentation_layer.Views.MedicoView.MedicoView;
 import presentation_layer.Views.PacienteView.PacienteView;
 import presentation_layer.Views.LoginView.LoginView;
+import presentation_layer.Views.PrescripcionView.PrescripcionView;
+import presentation_layer.Views.RecetasHistoricoView.RecetasHistoricoView;
 import service_layer.*;
 import utilites.FileManagement;
 import utilites.UserType;
@@ -33,12 +26,16 @@ public class Main {
     private static Service<Farmaceuta> farmaceutaService;
     private static Service<Paciente> pacienteService;
     private static Service<Medicamentos> medicamentosService;
+    private static Service<RecetaMedica> recetaMedicaService;
+
 
     // Vistas globales
     private static MedicoView medicoView;
     private static FarmaceutaView farmaceutaView;
     private static PacienteView pacienteView;
     private static MedicamentosView  medicamentosView;
+    private static PrescripcionView prescripcionView;
+    private static RecetasHistoricoView recetasHistoricoView;
     private static MainWindow mainWindow;
 
     // Diccionarios de tabs (manteniendo la estructura original)
@@ -46,6 +43,7 @@ public class Main {
     private static Dictionary<String, JPanel> tabs2;
     private static Dictionary<String, JPanel> tabs3;
     private static Dictionary<String, JPanel> tabs4;
+    private static Dictionary<String, JPanel> tabs5;
 
     public static void main(String[] args) {
         configurarLookAndFeel();
@@ -77,7 +75,13 @@ public class Main {
         pacienteService = new PacienteService(
                 FileManagement.getPacientesFileStore("pacientes.xml")
         );
+        //Inicializar servicio de medicamentos
         medicamentosService = new MedicamentoService(FileManagement.getMedicamentosFileStore("medicamentos.xml"));
+        //Inicializar servicio de Receta Medica
+recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFileStore("recetas.xml"));
+
+
+
     }
 
     private static void inicializarVistas() {
@@ -123,6 +127,36 @@ public class Main {
         medicamentosService.Observer(medicamentoTableModel);
         tabs4 = new Hashtable<>();
         tabs4.put("Medicamento", medicamentosView.getContentPanel());
+        // 1. Controller para RecetaMedica (para el histórico)
+        RecetaMedicaController recetaMedicaController = new RecetaMedicaController(recetaMedicaService);
+        RecetaMedicaTableModel recetaMedicaTableModel = new RecetaMedicaTableModel();
+
+        // 2. Controller para Prescripcion (para crear recetas)
+        PrescipcionController prescripcionController = new PrescipcionController(
+                recetaMedicaService,
+                pacienteService,
+                medicamentosService
+        );
+
+        // 3. Vista de prescripción (donde se crean las recetas)
+        prescripcionView = new PrescripcionView(
+                prescripcionController,
+                pacienteService,
+                medicamentosService
+        );
+
+        // 4. Vista de histórico (donde se ven las recetas guardadas)
+        recetasHistoricoView = new RecetasHistoricoView(
+                recetaMedicaController,
+                recetaMedicaTableModel,
+                recetaMedicaController.leerTodos()
+        );
+        recetaMedicaService.Observer(recetaMedicaTableModel);
+
+        // ✅ CORREGIDO: Inicializar tabs5 y agregar las vistas
+        tabs5 = new Hashtable<>();
+        tabs5.put("Prescribir", prescripcionView.getContentPanel());
+        tabs5.put("Historico", recetasHistoricoView.getContentPanel());
 
         // Inicializar ventana principal
         mainWindow = new MainWindow();
@@ -153,19 +187,24 @@ public class Main {
         switch (tipoUsuario) {
             case ADMINISTRADOR:
                 // El administrador puede ver todos los tabs
-                mainWindow.agregarTabs(tabs, tabs2, tabs3);
+                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5);
                 break;
 
             case MEDICO:
                 // Los médicos pueden ver médicos y pacientes
-
-                mainWindow.agregarTabs(tabs, tabs4, tabs3);
+                Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios3 = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios4 = new Hashtable<>();
+                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5);
                 break;
 
             case FARMACEUTA:
                 // Los farmaceutas pueden ver farmaceutas y pacientes
-                Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
-                mainWindow.agregarTabs(tabsVacios2, tabs2, tabs3);
+                Dictionary<String, JPanel> tabsVacios2_ = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios4_ = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios5 = new Hashtable<>();
+                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5);
                 break;
 
             default:

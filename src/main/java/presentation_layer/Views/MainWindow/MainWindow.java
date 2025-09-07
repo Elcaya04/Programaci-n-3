@@ -17,7 +17,7 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    public void agregarTabs(Dictionary<String, JPanel> tabs, Dictionary<String, JPanel> tabs2, Dictionary<String, JPanel> tabs3) {
+    public void agregarTabs(Dictionary<String, JPanel> tabs, Dictionary<String, JPanel> tabs2, Dictionary<String, JPanel> tabs3,Dictionary<String, JPanel> tabs4,Dictionary<String, JPanel> tabs5) {
         // Agregar tabs del primer diccionario
         if (tabs != null && !tabs.isEmpty()) {
             Enumeration<String> keys = tabs.keys();
