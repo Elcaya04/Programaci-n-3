@@ -47,6 +47,24 @@ public class MainWindow extends JFrame {
                 MainTabPanel.addTab(titulo3, contenido3);
             }
         }
+            if(tabs4 != null && !tabs4.isEmpty()) {
+                Enumeration<String> keys4 = tabs4.keys();
+                while (keys4.hasMoreElements()) {
+                    String titulo4 = keys4.nextElement();
+                    JPanel contenido4 = tabs4.get(titulo4);
+                    MainTabPanel.addTab(titulo4, contenido4);
+                }
+            }
+            if(tabs5 != null && !tabs5.isEmpty()) {
+                Enumeration<String> keys5 = tabs5.keys();
+                while (keys5.hasMoreElements()) {
+                    String titulo5 = keys5.nextElement();
+                    JPanel contenido5 = tabs5.get(titulo5);
+                    MainTabPanel.addTab(titulo5, contenido5);
+                }
+
+            }
+        }
     }
-}
+
 

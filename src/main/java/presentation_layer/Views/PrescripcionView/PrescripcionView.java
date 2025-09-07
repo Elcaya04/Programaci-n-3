@@ -3,7 +3,13 @@ package presentation_layer.Views.PrescripcionView;
 import org.example.domain_layer.Medicamentos;
 import org.example.domain_layer.Paciente;
 import org.example.domain_layer.RecetaMedica;
+import presentation_layer.Controllers.MedicamentosController;
+import presentation_layer.Controllers.PacienteController;
 import presentation_layer.Controllers.PrescipcionController;
+import presentation_layer.Controllers.RecetaMedicaController;
+import presentation_layer.Models.MedicamentoTableModel;
+import presentation_layer.Models.PacienteTableModel;
+import presentation_layer.Models.RecetaMedicaTableModel;
 import service_layer.Service;
 
 import javax.swing.*;
@@ -44,11 +50,32 @@ public class PrescripcionView {
     // Datos actuales
     private Paciente pacienteActual;
     private List<RecetaMedica> medicamentosReceta;
+    //Servicios
+    private Service<Paciente> pacienteService;
+    private Service<Medicamentos> medicamentosService;
+    //Controllers
+    private PacienteController pacienteController;
+    private MedicamentosController medicamentosController;
+    private RecetaMedicaController recetaMedicaController;
+    //Table model
+    private PacienteTableModel pacienteTableModel;
+    private MedicamentoTableModel medicamentosTableModel;
+    private RecetaMedicaTableModel recetaMedicaTableModel;
 
     public PrescripcionView(PrescipcionController controller,
-                            Service<org.example.domain_layer.Paciente> pacienteService,
-                            Service<Medicamentos> medicamentosService) {
+                            Service<Paciente> pacienteService,
+                            Service<Medicamentos> medicamentosService,PacienteController pacienteController,MedicamentosController medicamentosController,
+                            PacienteTableModel pacienteTableModel,MedicamentoTableModel medicamentosTableModel,
+                            RecetaMedicaController recetaMedicaController,RecetaMedicaTableModel recetaMedicaTableModel) {
         this.controller = controller;
+        this.pacienteController = pacienteController;
+        this.medicamentosController = medicamentosController;
+        this.recetaMedicaController = recetaMedicaController;
+        this.pacienteService = pacienteService;
+        this.medicamentosService = medicamentosService;
+        this.pacienteTableModel = pacienteTableModel;
+        this.medicamentosTableModel = medicamentosTableModel;
+        this.recetaMedicaTableModel = recetaMedicaTableModel;
         this.medicamentosReceta = new ArrayList<>();
 
         inicializarComponentes();
@@ -277,26 +304,35 @@ public class PrescripcionView {
     }
 
     private void buscarPaciente() {
-        // Aquí implementarás la lógica para abrir tu vista de pacientes en modo selección
-        // Por ahora un diálogo temporal
-        JOptionPane.showMessageDialog(panelContenido,
-                "Aquí se abrirá la vista de pacientes para seleccionar uno.\n" +
-                        "Implementaremos la integración con tu sistema de búsqueda existente.",
-                "Buscar Paciente",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            // Cargar todos los pacientes
+            List<Paciente> pacientes = pacienteService.LeerTodo();
 
-        // Simulación temporal para pruebas
-        simularSeleccionPaciente();
-    }
+            // Abrir dialog de selección
+            PacienteDialog dialog = new PacienteDialog(
+                    (JFrame) SwingUtilities.getWindowAncestor(panelContenido),
+                    pacienteController,
+                    pacienteTableModel,
+                    pacientes
+            );
 
-    private void simularSeleccionPaciente() {
-        // Crear un paciente temporal para pruebas
-        pacienteActual = new Paciente(
-                "12345678","Juan Pérez","01/01/1990", "8888-8888"
-        );
+            dialog.setVisible(true);
 
-        actualizarDatosPaciente(pacienteActual);
-        agregarMedicamentoButton.setEnabled(true);
+            if (dialog.isConfirmado()) {
+                Paciente pacienteSeleccionado = dialog.getPacienteSeleccionado();
+                if (pacienteSeleccionado != null) {
+                    this.pacienteActual = pacienteSeleccionado;
+                    actualizarDatosPaciente(pacienteSeleccionado);
+                    agregarMedicamentoButton.setEnabled(true);
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelContenido,
+                    "Error al cargar pacientes: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+        }
     }
 
     private void agregarMedicamento() {
@@ -308,45 +344,48 @@ public class PrescripcionView {
             return;
         }
 
-        // Aquí implementarás la lógica para abrir tu vista de medicamentos en modo selección
-        // Por ahora un diálogo temporal
-        JOptionPane.showMessageDialog(panelContenido,
-                "Aquí se abrirá la vista de medicamentos para seleccionar uno.\n" +
-                        "Después se abrirá el diálogo de detalles de la receta.",
-                "Agregar Medicamento",
-                JOptionPane.INFORMATION_MESSAGE);
+        try {
+            // Cargar todos los medicamentos
+            List<Medicamentos> medicamentos = medicamentosService.LeerTodo();
 
-        // Simulación temporal
-        simularAgregarMedicamento();
-    }
+            // Abrir dialog de selección de medicamentos
+            MedicamentoDialog dialog = new MedicamentoDialog(
+                    (JFrame) SwingUtilities.getWindowAncestor(panelContenido),
+                    medicamentosController,
+                    medicamentosTableModel,
+                    medicamentos
+            );
 
-    private void simularAgregarMedicamento() {
-        // Crear medicamento temporal para pruebas
-        Medicamentos medicamento = new Medicamentos(
-                "MED001", "Paracetamol", "Tabletas de 500mg"
-        );
+            dialog.setVisible(true);
 
-        // Abrir diálogo de detalles
-        DetalleRecetaDialog dialog = new DetalleRecetaDialog(
-                (JFrame) SwingUtilities.getWindowAncestor(panelContenido),
-                pacienteActual,
-                medicamento
-        );
-        dialog.setVisible(true);
+            if (dialog.isConfirmado()) {
+                Medicamentos medicamentoSeleccionado = dialog.getMedicamentoSeleccionado();
+                if (medicamentoSeleccionado != null) {
+                    // Abrir dialog de detalles de la receta
+                    DetalleRecetaDialog detalleDialog = new DetalleRecetaDialog(
+                            (JFrame) SwingUtilities.getWindowAncestor(panelContenido),
+                            pacienteActual,
+                            medicamentoSeleccionado
+                    );
 
-        if (dialog.isConfirmado()) {
-            // Agregar a la tabla
-            Object[] fila = {
-                    medicamento.getNombre(),
-                    medicamento.getPresentacion(),
-                    dialog.getCantidad(),
-                    dialog.getDuracion() + " días",
-                    dialog.getIndicaciones(),
-                    "Eliminar"
-            };
+                    detalleDialog.setVisible(true);
 
-            modeloTabla.addRow(fila);
-            guardarButton.setEnabled(true);
+                    if (detalleDialog.isConfirmado()) {
+                        agregarMedicamentoATabla(
+                                medicamentoSeleccionado,
+                                detalleDialog.getCantidad(),
+                                detalleDialog.getDuracion(),
+                                detalleDialog.getIndicaciones()
+                        );
+                    }
+                }
+            }
+
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(panelContenido,
+                    "Error al cargar medicamentos: " + e.getMessage(),
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
         }
     }
 
@@ -367,24 +406,65 @@ public class PrescripcionView {
 
         if (opcion == JOptionPane.YES_OPTION) {
             try {
-                // Aquí guardarías cada medicamento de la tabla como una receta separada
-                for (int i = 0; i < modeloTabla.getRowCount(); i++) {
-                    String numeroReceta = "REC-" + System.currentTimeMillis() + "-" + i;
-                    String fechaHoy = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
-                    String fechaRetiro = extraerFechaRetiro((String) fechaRetiroBox.getSelectedItem());
+                String fechaHoy = LocalDate.now().format(DateTimeFormatter.ofPattern("dd/MM/yyyy"));
+                String fechaRetiro = extraerFechaRetiro((String) fechaRetiroBox.getSelectedItem());
 
-                    // Crear objeto RecetaMedica (necesitarás completar con los datos reales)
-                    // controller.guardarReceta(receta, panelContenido);
+                // Guardar cada medicamento como una receta separada
+                for (int i = 0; i < modeloTabla.getRowCount(); i++) {
+                    // Generar número único para cada receta
+                    String numeroReceta = "REC-" + System.currentTimeMillis() + "-" + String.format("%03d", i);
+
+                    // Obtener datos de la tabla
+                    String nombreMedicamento = (String) modeloTabla.getValueAt(i, 0);
+                    String presentacion = (String) modeloTabla.getValueAt(i, 1);
+                    int cantidad = (Integer) modeloTabla.getValueAt(i, 2);
+                    String duracionTexto = (String) modeloTabla.getValueAt(i, 3);
+                    int duracion = Integer.parseInt(duracionTexto.replace(" días", ""));
+                    String indicaciones = (String) modeloTabla.getValueAt(i, 4);
+
+                    // Buscar el medicamento completo para obtener el código
+                    String codigoMedicamento = "";
+                    try {
+                        List<Medicamentos> medicamentos = medicamentosService.LeerTodo();
+                        for (Medicamentos med : medicamentos) {
+                            if (med.getNombre().equals(nombreMedicamento)) {
+                                codigoMedicamento = med.getCodigo();
+                                break;
+                            }
+                        }
+                    } catch (Exception e) {
+                        codigoMedicamento = "MED-" + i; // Código temporal si no se encuentra
+                    }
+
+                    // Llamar al controller para agregar la receta
+                    recetaMedicaController.agregar(
+                            numeroReceta,           // numeroReceta
+                            fechaHoy,              // fechaPrescripcion
+                            fechaRetiro,           // fechaRetiro
+                            "MED001",              // medicoId (deberías obtenerlo del médico logueado)
+                            pacienteActual.getID(),        // pacienteId
+                            pacienteActual.getNombre(),    // pacienteNombre
+                            codigoMedicamento,     // codigoMedicamento
+                            nombreMedicamento,     // nombreMedicamento
+                            presentacion,          // presentacion
+                            cantidad,              // cantidad
+                            duracion,              // duracionDias
+                            indicaciones           // indicaciones
+                    );
+
+
+                    Thread.sleep(1);
                 }
 
                 JOptionPane.showMessageDialog(panelContenido,
-                        "Receta guardada exitosamente",
+                        "Receta(s) guardada(s) exitosamente",
                         "Éxito",
                         JOptionPane.INFORMATION_MESSAGE);
 
                 limpiarFormulario();
 
             } catch (Exception e) {
+                e.printStackTrace(); // Para debug
                 JOptionPane.showMessageDialog(panelContenido,
                         "Error al guardar la receta: " + e.getMessage(),
                         "Error",
@@ -415,6 +495,7 @@ public class PrescripcionView {
         if (paciente != null) {
             nombrePaciente.setText(paciente.getNombre());
             cedulaPaciente.setText(paciente.getID());
+            telefonoPaciente.setText(paciente.getNum_Telefono());
 
             // Cambiar color para indicar que hay paciente seleccionado
             nombrePaciente.setForeground(new Color(46, 125, 50));
@@ -472,7 +553,7 @@ public class PrescripcionView {
         return modeloTabla;
     }
 
-    // Método para cuando integres con tus vistas existentes
+
     public void agregarMedicamentoATabla(Medicamentos medicamento, int cantidad,
                                          int duracion, String indicaciones) {
         Object[] fila = {
@@ -502,7 +583,7 @@ public class PrescripcionView {
         medicamentosReceta.add(receta);
     }
 
-    // Método para eliminar medicamento de la tabla
+
     public void eliminarMedicamentoDeLaTabla(int fila) {
         if (fila >= 0 && fila < modeloTabla.getRowCount()) {
             modeloTabla.removeRow(fila);

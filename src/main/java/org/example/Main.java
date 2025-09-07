@@ -142,7 +142,8 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         prescripcionView = new PrescripcionView(
                 prescripcionController,
                 pacienteService,
-                medicamentosService
+                medicamentosService,pacienteController,medicamentosController,pacienteTableModel,
+                medicamentoTableModel,recetaMedicaController,recetaMedicaTableModel
         );
 
         // 4. Vista de histórico (donde se ven las recetas guardadas)
@@ -153,7 +154,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         );
         recetaMedicaService.Observer(recetaMedicaTableModel);
 
-        // ✅ CORREGIDO: Inicializar tabs5 y agregar las vistas
+        // Inicializar tabs5 y agregar las vistas
         tabs5 = new Hashtable<>();
         tabs5.put("Prescribir", prescripcionView.getContentPanel());
         tabs5.put("Historico", recetasHistoricoView.getContentPanel());
@@ -192,10 +193,11 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
 
             case MEDICO:
                 // Los médicos pueden ver médicos y pacientes
-                Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios3 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4 = new Hashtable<>();
+
                 mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5);
                 break;
 

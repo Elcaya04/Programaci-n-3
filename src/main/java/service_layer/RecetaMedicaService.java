@@ -77,10 +77,10 @@ public class RecetaMedicaService implements Service<RecetaMedica> {
     }
 
     @Override
-    public RecetaMedica LeerID(String codigo) {
+    public RecetaMedica LeerID(String Numero_Receta) {
         return fileStore.Leer()
                 .stream()
-                .filter(c -> c.getCodigoMedicamento().equals(codigo))
+                .filter(c -> c.getNumeroReceta().equals(Numero_Receta))
                 .findFirst()
                 .orElse(null);
     }
