@@ -17,7 +17,8 @@ public class MainWindow extends JFrame {
         setLocationRelativeTo(null);
     }
 
-    public void agregarTabs(Dictionary<String, JPanel> tabs, Dictionary<String, JPanel> tabs2, Dictionary<String, JPanel> tabs3,Dictionary<String, JPanel> tabs4,Dictionary<String, JPanel> tabs5) {
+    public void agregarTabs(Dictionary<String, JPanel> tabs, Dictionary<String, JPanel> tabs2, Dictionary<String, JPanel> tabs3,
+                            Dictionary<String, JPanel> tabs4,Dictionary<String, JPanel> tabs5,Dictionary<String,JPanel> tabs6) {
         // Agregar tabs del primer diccionario
         if (tabs != null && !tabs.isEmpty()) {
             Enumeration<String> keys = tabs.keys();
@@ -63,6 +64,14 @@ public class MainWindow extends JFrame {
                     MainTabPanel.addTab(titulo5, contenido5);
                 }
 
+            }
+            if (tabs6 != null && !tabs6.isEmpty()) {
+                Enumeration<String> keys6 = tabs6.keys();
+                while (keys6.hasMoreElements()) {
+                    String titulo6 = keys6.nextElement();
+                    JPanel contenido6 = tabs6.get(titulo6);
+                    MainTabPanel.addTab(titulo6, contenido6);
+                }
             }
         }
     }

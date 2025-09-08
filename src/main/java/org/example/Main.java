@@ -11,6 +11,7 @@ import presentation_layer.Views.MedicoView.MedicoView;
 import presentation_layer.Views.PacienteView.PacienteView;
 import presentation_layer.Views.LoginView.LoginView;
 import presentation_layer.Views.PrescripcionView.PrescripcionView;
+import presentation_layer.Views.RecetasChartView.RecetasChartView;
 import presentation_layer.Views.RecetasHistoricoView.RecetasHistoricoView;
 import service_layer.*;
 import utilites.FileManagement;
@@ -29,6 +30,7 @@ public class Main {
     private static Service<RecetaMedica> recetaMedicaService;
 
 
+
     // Vistas globales
     private static MedicoView medicoView;
     private static FarmaceutaView farmaceutaView;
@@ -36,6 +38,7 @@ public class Main {
     private static MedicamentosView  medicamentosView;
     private static PrescripcionView prescripcionView;
     private static RecetasHistoricoView recetasHistoricoView;
+    private static RecetasChartView recetasChartView;
     private static MainWindow mainWindow;
 
     // Diccionarios de tabs (manteniendo la estructura original)
@@ -44,6 +47,7 @@ public class Main {
     private static Dictionary<String, JPanel> tabs3;
     private static Dictionary<String, JPanel> tabs4;
     private static Dictionary<String, JPanel> tabs5;
+    private static Dictionary<String, JPanel> tabs6;
 
     public static void main(String[] args) {
         configurarLookAndFeel();
@@ -153,7 +157,12 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 recetaMedicaController.leerTodos()
         );
         recetaMedicaService.Observer(recetaMedicaTableModel);
-
+        //5. Vista de el dashboard
+        RecetaMedicaChartController recetaMedicaChartController = new RecetaMedicaChartController(recetaMedicaService);
+        recetasChartView = new RecetasChartView(recetaMedicaChartController);
+        //Inicializo los tabs6 y los agrego a las vistas
+        tabs6 = new Hashtable<>();
+        tabs6.put("Dashboard", recetasChartView.getContentPanel());
         // Inicializar tabs5 y agregar las vistas
         tabs5 = new Hashtable<>();
         tabs5.put("Prescribir", prescripcionView.getContentPanel());
@@ -188,7 +197,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         switch (tipoUsuario) {
             case ADMINISTRADOR:
                 // El administrador puede ver todos los tabs
-                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5);
+                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5,tabs6);
                 break;
 
             case MEDICO:
@@ -198,7 +207,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 Dictionary<String, JPanel> tabsVacios3 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4 = new Hashtable<>();
 
-                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5);
+                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5,tabs6);
                 break;
 
             case FARMACEUTA:
@@ -206,7 +215,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 Dictionary<String, JPanel> tabsVacios2_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios5 = new Hashtable<>();
-                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5);
+                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5,tabs6);
                 break;
 
             default:
