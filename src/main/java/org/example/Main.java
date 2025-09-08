@@ -48,14 +48,14 @@ public class Main {
     private static Dictionary<String, JPanel> tabs4;
     private static Dictionary<String, JPanel> tabs5;
     private static Dictionary<String, JPanel> tabs6;
-
+//Funcion main donde se llaman todos los metodos para su ejecucion
     public static void main(String[] args) {
         configurarLookAndFeel();
         inicializarServicios();
         inicializarVistas();
         mostrarLogin();
     }
-
+//Metodo para configurar la vista de la interfaz grafica
     private static void configurarLookAndFeel() {
         try {
             UIManager.setLookAndFeel(new FlatDarculaLaf());
@@ -124,6 +124,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         pacienteService.Observer(pacienteTableModel);
         tabs3 = new Hashtable<>();
         tabs3.put("Paciente", pacienteView.getContentPanel());
+
         //Infraestructura de Medicamentos
         MedicamentosController medicamentosController = new MedicamentosController(medicamentosService);
         MedicamentoTableModel medicamentoTableModel = new MedicamentoTableModel();
@@ -131,6 +132,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         medicamentosService.Observer(medicamentoTableModel);
         tabs4 = new Hashtable<>();
         tabs4.put("Medicamento", medicamentosView.getContentPanel());
+
         // 1. Controller para RecetaMedica (para el histórico)
         RecetaMedicaController recetaMedicaController = new RecetaMedicaController(recetaMedicaService);
         RecetaMedicaTableModel recetaMedicaTableModel = new RecetaMedicaTableModel();
