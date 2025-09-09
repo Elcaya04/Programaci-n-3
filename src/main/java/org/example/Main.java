@@ -296,29 +296,5 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
             e.printStackTrace();
         }
     }
-    // Métodos de utilidad para acceder a los servicios desde otras clases si es necesario
-    public static Service<Medico> getMedicoService() {
-        return medicoService;
-    }
 
-    public static Service<Farmaceuta> getFarmaceutaService() {
-        return farmaceutaService;
-    }
-
-    public static Service<Paciente> getPacienteService() {
-        return pacienteService;
-    }
-
-    // Métodos de utilidad para acceder a los diccionarios de tabs si es necesario
-    public static Dictionary<String, JPanel> getTabs() {
-        return tabs;
-    }
-
-    public static Dictionary<String, JPanel> getTabs2() {
-        return tabs2;
-    }
-
-    public static Dictionary<String, JPanel> getTabs3() {
-        return tabs3;
-    }
 }
