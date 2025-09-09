@@ -4,6 +4,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import org.example.domain_layer.*;
 import presentation_layer.Controllers.*;
 import presentation_layer.Models.*;
+import presentation_layer.Views.DespachoView.DespachoView;
 import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
 import presentation_layer.Views.MainWindow.MainWindow;
 import presentation_layer.Views.MedicamentosView.MedicamentosView;
@@ -39,6 +40,7 @@ public class Main {
     private static PrescripcionView prescripcionView;
     private static RecetasHistoricoView recetasHistoricoView;
     private static RecetasChartView recetasChartView;
+    private static DespachoView despachoView;
     private static MainWindow mainWindow;
 
     // Diccionarios de tabs (manteniendo la estructura original)
@@ -48,6 +50,7 @@ public class Main {
     private static Dictionary<String, JPanel> tabs4;
     private static Dictionary<String, JPanel> tabs5;
     private static Dictionary<String, JPanel> tabs6;
+    private static Dictionary<String, JPanel> tabs7;
     //Para el usuario Logeado
     private static Object usuarioLogueado;
 //Funcion main donde se llaman todos los metodos para su ejecucion
@@ -171,6 +174,12 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         tabs5 = new Hashtable<>();
         tabs5.put("Prescribir", prescripcionView.getContentPanel());
         tabs5.put("Historico", recetasHistoricoView.getContentPanel());
+        //Inicializo los tabs 7 y los agrego a las vistas
+        //Con el controller y el view del Despacho
+        DespachoController despachoController = new DespachoController(recetaMedicaService);
+        despachoView = new DespachoView(despachoController,null);
+        tabs7 = new Hashtable<>();
+        tabs7.put("Despacho", despachoView.getContentPanel());
 
         // Inicializar ventana principal
         mainWindow = new MainWindow();
@@ -202,7 +211,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         switch (tipoUsuario) {
             case ADMINISTRADOR:
                 // El administrador puede ver todos los tabs
-                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5,tabs6);
+                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5,tabs6,tabs7);
                 break;
 
             case MEDICO:
@@ -211,8 +220,9 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios3 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4 = new Hashtable<>();
+                Dictionary<String, JPanel> tabsVacios7 = new Hashtable<>();
 
-                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5,tabs6);
+                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5,tabs6,tabsVacios7);
                 break;
 
             case FARMACEUTA:
@@ -220,7 +230,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 Dictionary<String, JPanel> tabsVacios2_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios5 = new Hashtable<>();
-                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5,tabs6);
+                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5,tabs6,tabs7);
                 break;
 
             default:
@@ -257,12 +267,27 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
 
                 case FARMACEUTA:
                     // Buscar el farmaceuta en el servicio
+                    boolean farmaceutaEncontrado = false;
                     for (Farmaceuta farmaceuta : farmaceutaService.LeerTodo()) {
                         if (farmaceuta.getID().equals(usuario) || farmaceuta.getNombre().equals(usuario)) {
                             usuarioLogueado = farmaceuta;
+                            if (despachoView != null) {
+                                despachoView.setFarmaceutaActual(farmaceuta);
+                            }
+                            farmaceutaEncontrado = true;
                             System.out.println("Farmaceuta logueado: " + farmaceuta.getNombre());
                             break;
                         }
+                        if (!farmaceutaEncontrado) {
+                            System.out.println("Advertencia: No se encontró el farmaceuta con usuario: " + usuario);
+                            // Crear farmaceuta temporal si es necesario
+                            Farmaceuta farmaceutaTemporal = new Farmaceuta("FARM-001","1234", "Farmaceuta Temporal");
+                            usuarioLogueado = farmaceutaTemporal;
+                            if (despachoView != null) {
+                                despachoView.setFarmaceutaActual(farmaceutaTemporal);
+                            }
+                        }
+
                     }
                     break;
             }

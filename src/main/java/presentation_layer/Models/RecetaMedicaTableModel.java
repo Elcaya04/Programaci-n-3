@@ -71,8 +71,12 @@ public class RecetaMedicaTableModel extends AbstractTableModel implements Servic
         switch (state) {
             case PENDING:
                 return "Pendiente";
-            case DISPENSED:
-                return "Despachado";
+            case PROCESSING:
+                return "En Proceso";
+            case READY:
+                return "Lista";
+            case DELIVERED:
+                return "Entregada";
             case EXPIRED:
                 return "Expirado";
             default:

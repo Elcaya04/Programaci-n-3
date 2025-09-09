@@ -1,7 +1,7 @@
 package utilites;
 
 public enum PrescriptionState {
-    PENDING,
-     DISPENSED,
+    PENDING,PROCESSING,READY,
+    DELIVERED,
     EXPIRED
 }

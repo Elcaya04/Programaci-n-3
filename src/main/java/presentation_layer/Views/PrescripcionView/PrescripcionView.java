@@ -607,10 +607,12 @@ public class PrescripcionView {
         switch (state) {
             case PENDING:
                 return "Pendiente";
-            case DISPENSED:
-                return "Despachado";
-            case EXPIRED:
-                return "Expirado";
+            case PROCESSING:
+                return "En Proceso";
+            case READY:
+                return "Lista";
+            case DELIVERED:
+                return "Entregada";
             default:
                 return state.toString();
         }
@@ -619,8 +621,12 @@ public class PrescripcionView {
         switch (estadoTexto) {
             case "Pendiente":
                 return PrescriptionState.PENDING;
-            case "Despachado":
-                return PrescriptionState.DISPENSED;
+            case "En Proceso":
+                return PrescriptionState.PROCESSING;
+            case "Lista":
+                return PrescriptionState.READY;
+            case "Entregada":
+                return PrescriptionState.DELIVERED;
             case "Expirado":
                 return PrescriptionState.EXPIRED;
             default:
