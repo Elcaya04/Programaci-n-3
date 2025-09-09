@@ -28,7 +28,7 @@ public class Main {
     private static Service<Paciente> pacienteService;
     private static Service<Medicamentos> medicamentosService;
     private static Service<RecetaMedica> recetaMedicaService;
-
+//Llamadas a clases
 
 
     // Vistas globales
@@ -48,6 +48,8 @@ public class Main {
     private static Dictionary<String, JPanel> tabs4;
     private static Dictionary<String, JPanel> tabs5;
     private static Dictionary<String, JPanel> tabs6;
+    //Para el usuario Logeado
+    private static Object usuarioLogueado;
 //Funcion main donde se llaman todos los metodos para su ejecucion
     public static void main(String[] args) {
         configurarLookAndFeel();
@@ -149,7 +151,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 prescripcionController,
                 pacienteService,
                 medicamentosService,pacienteController,medicamentosController,pacienteTableModel,
-                medicamentoTableModel,recetaMedicaController,recetaMedicaTableModel
+                medicamentoTableModel,recetaMedicaController,recetaMedicaTableModel,null
         );
 
         // 4. Vista de histórico (donde se ven las recetas guardadas)
@@ -195,6 +197,7 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
     private static void configurarInterfazSegunUsuario(String usuario, UserType tipoUsuario) {
         // Configurar título con el usuario
         mainWindow.setTitle("Sistema de Gestión - Usuario: " + usuario);
+        establecerUsuarioLogueado(usuario, tipoUsuario);
 
         switch (tipoUsuario) {
             case ADMINISTRADOR:
@@ -225,7 +228,49 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
                 break;
         }
     }
+    private static void establecerUsuarioLogueado(String usuario, UserType tipoUsuario) {
+        try {
+            switch (tipoUsuario) {
+                case MEDICO:
+                    boolean medicoEncontrado = false;
+                    for (Medico medico : medicoService.LeerTodo()) {
+                        if (medico.getID().equals(usuario) || medico.getNombre().equals(usuario)) {
+                            usuarioLogueado = medico;
+                            prescripcionView.setMedicoActual(medico);
+                            medicoEncontrado = true;
+                            System.out.println("Médico logueado: " + medico.getNombre() + " (ID: " + medico.getID() + ")");
+                            break;
+                        }
+                    }
 
+                    if (!medicoEncontrado) {
+                        System.out.println("Advertencia: No se encontró el médico con usuario: " + usuario);
+                        // Para administradores que no sean médicos, crear un médico temporal
+                        if (tipoUsuario == UserType.ADMINISTRADOR) {
+                            Medico medicoTemporal = new Medico("ADMIN-001", "Administrador",
+                                    "Cardiologo", "ADMIN-001");
+                            prescripcionView.setMedicoActual(medicoTemporal);
+                            usuarioLogueado = medicoTemporal;
+                        }
+                    }
+                    break;
+
+                case FARMACEUTA:
+                    // Buscar el farmaceuta en el servicio
+                    for (Farmaceuta farmaceuta : farmaceutaService.LeerTodo()) {
+                        if (farmaceuta.getID().equals(usuario) || farmaceuta.getNombre().equals(usuario)) {
+                            usuarioLogueado = farmaceuta;
+                            System.out.println("Farmaceuta logueado: " + farmaceuta.getNombre());
+                            break;
+                        }
+                    }
+                    break;
+            }
+        } catch (Exception e) {
+            System.err.println("Error al establecer usuario logueado: " + e.getMessage());
+            e.printStackTrace();
+        }
+    }
     // Métodos de utilidad para acceder a los servicios desde otras clases si es necesario
     public static Service<Medico> getMedicoService() {
         return medicoService;

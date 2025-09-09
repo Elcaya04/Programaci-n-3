@@ -3,6 +3,7 @@ package presentation_layer.Controllers;
 
 import org.example.domain_layer.RecetaMedica;
 import service_layer.Service;
+import utilites.PrescriptionState;
 
 import java.util.List;
 
@@ -16,9 +17,9 @@ public class RecetaMedicaController {
     public void agregar(String numeroReceta, String fechaPrescripcion, String fechaRetiro,
                         String medicoId, String pacienteId, String pacienteNombre,
                         String codigoMedicamento, String nombreMedicamento, String presentacion,
-                        int cantidad, int duracionDias, String indicaciones) {
+                        int cantidad, int duracionDias, String indicaciones, PrescriptionState estado) {
         validarNombre(nombreMedicamento);
-        RecetaMedica c = new RecetaMedica(numeroReceta, fechaPrescripcion, fechaRetiro,medicoId,pacienteId,pacienteNombre,codigoMedicamento,nombreMedicamento,presentacion,cantidad,duracionDias,indicaciones);
+        RecetaMedica c = new RecetaMedica(numeroReceta, fechaPrescripcion, fechaRetiro,medicoId,pacienteId,pacienteNombre,codigoMedicamento,nombreMedicamento,presentacion,cantidad,duracionDias,indicaciones,estado);
         service.agregar(c);
     }
     public List<RecetaMedica> leerTodos() {
@@ -39,7 +40,7 @@ public class RecetaMedicaController {
                            int cantidad, int duracionDias, String indicaciones) {
 
         validarNombre(nombreMedicamento);
-        RecetaMedica c = new RecetaMedica(numeroReceta, fechaPrescripcion, fechaRetiro,medicoId,pacienteId,pacienteNombre,codigoMedicamento,nombreMedicamento,presentacion,cantidad,duracionDias,indicaciones);
+        RecetaMedica c = new RecetaMedica(numeroReceta, fechaPrescripcion, fechaRetiro,medicoId,pacienteId,pacienteNombre,codigoMedicamento,nombreMedicamento,presentacion,cantidad,duracionDias,indicaciones,PrescriptionState.PENDING);
         service.actualizar(c);
     }
     private void validarId(String id) {

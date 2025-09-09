@@ -3,6 +3,7 @@ package presentation_layer.Models;
 import org.example.domain_layer.RecetaMedica;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.general.DefaultPieDataset;
+import utilites.PrescriptionState;
 
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -77,7 +78,7 @@ public class RecetaMedicaChartModel {
         // Contar recetas por estado
         Map<String, Integer> estadoCount = recetas.stream()
                 .collect(Collectors.groupingBy(
-                        r -> r.getEstado() != null ? r.getEstado() : "Sin Estado",
+                        r -> r.getEstado() != null ? formatStateName(r.getEstado()) : "Sin Estado",
                         Collectors.collectingAndThen(Collectors.counting(), Math::toIntExact)
                 ));
 
@@ -113,12 +114,25 @@ public class RecetaMedicaChartModel {
         }
 
         return recetas.stream()
-                .map(r -> r.getEstado() != null ? r.getEstado() : "Sin Estado")
+                .map(r -> r.getEstado() != null ? formatStateName(r.getEstado()) : "Sin Estado")
                 .distinct()
                 .sorted()
                 .collect(Collectors.toList());
     }
+    private String formatStateName(PrescriptionState state) {
+        if (state == null) return "Sin Estado";
 
+        switch (state) {
+            case PENDING:
+                return "Pendiente";
+            case DISPENSED:
+                return "Despachado";
+            case EXPIRED:
+                return "Expirado";
+            default:
+                return state.toString();
+        }
+    }
     /**
      * Convierte fecha string a mes-año para agrupación
      */
@@ -126,7 +140,8 @@ public class RecetaMedicaChartModel {
         try {
             SimpleDateFormat inputFormat = new SimpleDateFormat("dd/MM/yyyy");
             Date fecha = inputFormat.parse(fechaStr);
-            return displayFormat.format(fecha);
+            SimpleDateFormat dayFormat = new SimpleDateFormat("dd/MM");
+            return dayFormat.format(fecha);
         } catch (Exception e) {
             return "Fecha inválida";
         }

@@ -3,14 +3,15 @@ package presentation_layer.Models;
 import org.example.domain_layer.RecetaMedica;
 import service_layer.ServiceObserver;
 import utilites.ChangeType;
+import utilites.PrescriptionState;
 
 import javax.swing.table.AbstractTableModel;
 import java.util.ArrayList;
 import java.util.List;
 
 public class RecetaMedicaTableModel extends AbstractTableModel implements ServiceObserver<RecetaMedica> {
-    private final String[] cols = { "N° Receta", "Fecha Prescripción", "Médico", "Paciente", "Medicamento", "Cantidad", "Duración", "Estado"};
-    private final Class<?>[] types = { String.class, String.class, String.class, String.class, String.class, String.class, String.class, String.class };
+    private final String[] cols = { "N° Receta", "Fecha Prescripción", "Médico", "Paciente", "Medicamento", "Cantidad", "Duración", "Estado","Acciones"};
+    private final Class<?>[] types = { String.class, String.class, String.class, String.class, String.class, String.class, String.class,String.class };
     private final List<RecetaMedica> rows = new ArrayList<>();
 
     public void setRows(List<RecetaMedica> data) {
@@ -45,7 +46,7 @@ public class RecetaMedicaTableModel extends AbstractTableModel implements Servic
 
     @Override
     public boolean isCellEditable(int r, int c) {
-        return false;
+        return c==8;
     }
 
     @Override
@@ -59,11 +60,25 @@ public class RecetaMedicaTableModel extends AbstractTableModel implements Servic
             case 4: return x.getNombreMedicamento();
             case 5: return x.getCantidad() + " " + x.getPresentacion();
             case 6: return x.getDuracionDias() + " días";
-            case 7: return x.getEstado();
+            case 7: return formatStateName(x.getEstado());
+            case 8: return "Elimnar";
             default: return null;
         }
     }
+    private String formatStateName(PrescriptionState state) {
+        if (state == null) return "Sin Estado";
 
+        switch (state) {
+            case PENDING:
+                return "Pendiente";
+            case DISPENSED:
+                return "Despachado";
+            case EXPIRED:
+                return "Expirado";
+            default:
+                return state.toString();
+        }
+    }
     @Override
     public void DataChanged(ChangeType type, RecetaMedica entity) {
         switch (type) {

@@ -177,7 +177,7 @@ public class PrescipcionController {
                         medicamento.getPresentacion(),
                         dialog.getCantidad(),
                         dialog.getDuracion(),
-                        dialog.getIndicaciones()
+                        dialog.getIndicaciones(),dialog.getEstado()
                 );
 
                 return receta;

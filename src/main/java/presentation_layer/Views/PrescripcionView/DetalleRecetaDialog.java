@@ -2,6 +2,7 @@ package presentation_layer.Views.PrescripcionView;
 
 import org.example.domain_layer.Medicamentos;
 import org.example.domain_layer.Paciente;
+import utilites.PrescriptionState;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -13,6 +14,7 @@ public class DetalleRecetaDialog extends JDialog {
     private JTextField txtCantidad;
     private JTextField txtDuracion;
     private JTextArea txtIndicaciones;
+    private JComboBox<PrescriptionState> cmbEstado;
     private JButton btnGuardar;
     private JButton btnCancelar;
 
@@ -20,6 +22,7 @@ public class DetalleRecetaDialog extends JDialog {
     private int cantidad;
     private int duracion;
     private String indicaciones;
+    private PrescriptionState estado;
 
     private Paciente paciente;
     private Medicamentos medicamento;
@@ -119,8 +122,28 @@ public class DetalleRecetaDialog extends JDialog {
         txtDuracion.setToolTipText("Ingrese la duración del tratamiento en días");
         panel.add(txtDuracion, gbc);
 
-        // Indicaciones
+
+        // Estado de la prescripción
         gbc.gridx = 0; gbc.gridy = 2; gbc.fill = GridBagConstraints.NONE;
+        panel.add(new JLabel("Estado:"), gbc);
+        gbc.gridx = 1; gbc.fill = GridBagConstraints.HORIZONTAL;
+        cmbEstado = new JComboBox<>(PrescriptionState.values());
+        cmbEstado.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value,
+                                                          int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if (value instanceof PrescriptionState) {
+                    PrescriptionState state = (PrescriptionState) value;
+                    setText(formatStateName(state));
+                }
+                return this;
+            }
+        });
+        cmbEstado.setToolTipText("Seleccione el estado de la prescripción");
+        panel.add(cmbEstado, gbc);
+        // Indicaciones
+        gbc.gridx = 0; gbc.gridy = 3; gbc.fill = GridBagConstraints.NONE;
         gbc.anchor = GridBagConstraints.NORTHWEST;
         panel.add(new JLabel("Indicaciones:"), gbc);
 
@@ -133,6 +156,7 @@ public class DetalleRecetaDialog extends JDialog {
 
         JScrollPane scrollPane = new JScrollPane(txtIndicaciones);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setPreferredSize(new Dimension(300, 120));
         panel.add(scrollPane, gbc);
 
         return panel;
@@ -232,7 +256,7 @@ public class DetalleRecetaDialog extends JDialog {
                 txtIndicaciones.requestFocus();
                 return false;
             }
-
+            estado = (PrescriptionState) cmbEstado.getSelectedItem();
             return true;
 
         } catch (NumberFormatException e) {
@@ -247,7 +271,7 @@ public class DetalleRecetaDialog extends JDialog {
     }
 
     private void configurarVentana() {
-        setSize(600, 500);
+        setSize(600, 610);
         setLocationRelativeTo(getParent());
         setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         setResizable(false);
@@ -259,8 +283,21 @@ public class DetalleRecetaDialog extends JDialog {
         txtDuracion.setText("7");
         txtIndicaciones.setText("Tomar 1 " + medicamento.getPresentacion().toLowerCase() +
                 " cada 8 horas después de las comidas.");
+        cmbEstado.setSelectedItem(PrescriptionState.PENDING);
     }
-
+    // Metodo para el estado que salga en español
+    private String formatStateName(PrescriptionState state) {
+        switch (state) {
+            case PENDING:
+                return "Pendiente";
+            case DISPENSED:
+                return "Despachado";
+            case EXPIRED:
+                return "Expirado";
+            default:
+                return state.toString();
+        }
+    }
     // Getters
     public boolean isConfirmado() {
         return confirmado;
@@ -276,5 +313,11 @@ public class DetalleRecetaDialog extends JDialog {
 
     public String getIndicaciones() {
         return indicaciones;
+    }
+    public PrescriptionState getEstado() {
+        return estado;
+    }
+    public String getEstadoAsString() {
+        return estado != null ? formatStateName(estado) : "Pendiente";
     }
 }

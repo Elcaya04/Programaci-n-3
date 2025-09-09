@@ -225,6 +225,12 @@ public class RecetasChartView {
         plot.setBackgroundPaint(Color.WHITE);
         plot.setRangeGridlinePaint(Color.LIGHT_GRAY);
         plot.setDomainGridlinePaint(Color.LIGHT_GRAY);
+
+        // Ajustar el rango del eje Y para mostrar mejor los datos
+        plot.getRangeAxis().setAutoRange(true);
+        plot.getRangeAxis().setLowerMargin(0.1);
+        plot.getRangeAxis().setUpperMargin(0.1);
+
         chart.getTitle().setFont(new Font("Arial", Font.BOLD, 14));
     }
 

@@ -4,6 +4,7 @@ import jakarta.xml.bind.annotation.XmlAccessType;
 import jakarta.xml.bind.annotation.XmlAccessorType;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlRootElement;
+import utilites.PrescriptionState;
 
 @XmlRootElement(name="receta")
 @XmlAccessorType(XmlAccessType.FIELD)
@@ -46,7 +47,7 @@ public class RecetaMedica {
     String Indicaciones;
 
     @XmlElement(name = "estado")
-    String Estado; // "PENDIENTE", "DESPACHADA", "VENCIDA"
+    PrescriptionState Estado; // "PENDIENTE", "DESPACHADA", "VENCIDA"
 
     @XmlElement(name = "farmaceutaDespacho")
     String FarmaceutaDespacho;
@@ -56,7 +57,7 @@ public class RecetaMedica {
     public RecetaMedica(String numeroReceta, String fechaPrescripcion, String fechaRetiro,
                         String medicoId, String pacienteId, String pacienteNombre,
                         String codigoMedicamento, String nombreMedicamento, String presentacion,
-                        int cantidad, int duracionDias, String indicaciones) {
+                        int cantidad, int duracionDias, String indicaciones, PrescriptionState estado) {
         NumeroReceta = numeroReceta;
         FechaPrescripcion = fechaPrescripcion;
         FechaRetiro = fechaRetiro;
@@ -69,7 +70,7 @@ public class RecetaMedica {
         Cantidad = cantidad;
         DuracionDias = duracionDias;
         Indicaciones = indicaciones;
-        Estado = "PENDIENTE";
+        Estado = estado;
     }
 
     // Getters y Setters
@@ -109,8 +110,8 @@ public class RecetaMedica {
     public String getIndicaciones() { return Indicaciones; }
     public void setIndicaciones(String indicaciones) { Indicaciones = indicaciones; }
 
-    public String getEstado() { return Estado; }
-    public void setEstado(String estado) { Estado = estado; }
+    public PrescriptionState getEstado() { return Estado; }
+    public void setEstado(PrescriptionState estado) { Estado = estado; }
 
     public String getFarmaceutaDespacho() { return FarmaceutaDespacho; }
     public void setFarmaceutaDespacho(String farmaceutaDespacho) { FarmaceutaDespacho = farmaceutaDespacho; }

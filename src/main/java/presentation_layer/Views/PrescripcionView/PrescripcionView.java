@@ -1,6 +1,7 @@
 package presentation_layer.Views.PrescripcionView;
 
 import org.example.domain_layer.Medicamentos;
+import org.example.domain_layer.Medico;
 import org.example.domain_layer.Paciente;
 import org.example.domain_layer.RecetaMedica;
 import presentation_layer.Controllers.MedicamentosController;
@@ -11,6 +12,7 @@ import presentation_layer.Models.MedicamentoTableModel;
 import presentation_layer.Models.PacienteTableModel;
 import presentation_layer.Models.RecetaMedicaTableModel;
 import service_layer.Service;
+import utilites.PrescriptionState;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -50,6 +52,7 @@ public class PrescripcionView {
     // Datos actuales
     private Paciente pacienteActual;
     private List<RecetaMedica> medicamentosReceta;
+    private Medico medicoActual;
     //Servicios
     private Service<Paciente> pacienteService;
     private Service<Medicamentos> medicamentosService;
@@ -66,7 +69,7 @@ public class PrescripcionView {
                             Service<Paciente> pacienteService,
                             Service<Medicamentos> medicamentosService,PacienteController pacienteController,MedicamentosController medicamentosController,
                             PacienteTableModel pacienteTableModel,MedicamentoTableModel medicamentosTableModel,
-                            RecetaMedicaController recetaMedicaController,RecetaMedicaTableModel recetaMedicaTableModel) {
+                            RecetaMedicaController recetaMedicaController,RecetaMedicaTableModel recetaMedicaTableModel,Medico medicoActual) {
         this.controller = controller;
         this.pacienteController = pacienteController;
         this.medicamentosController = medicamentosController;
@@ -76,7 +79,9 @@ public class PrescripcionView {
         this.pacienteTableModel = pacienteTableModel;
         this.medicamentosTableModel = medicamentosTableModel;
         this.recetaMedicaTableModel = recetaMedicaTableModel;
+        this.medicoActual = medicoActual;
         this.medicamentosReceta = new ArrayList<>();
+
 
         inicializarComponentes();
         configurarEventos();
@@ -246,11 +251,11 @@ public class PrescripcionView {
         panel.setBorder(BorderFactory.createTitledBorder("Medicamentos en la Receta"));
 
         // Crear modelo de tabla
-        String[] columnas = {"Medicamento", "Presentación", "Cantidad", "Duración", "Indicaciones", "Acciones"};
+        String[] columnas = {"Medicamento", "Presentación", "Cantidad", "Duración", "Indicaciones","Estado","Acciones"};
         modeloTabla = new DefaultTableModel(columnas, 0) {
             @Override
             public boolean isCellEditable(int row, int column) {
-                return column == 5; // Solo la columna de acciones es editable
+                return column == 6; // Solo la columna de acciones es editable
             }
         };
 
@@ -263,7 +268,8 @@ public class PrescripcionView {
         tablaRecetaMedica.getColumnModel().getColumn(2).setPreferredWidth(80);  // Cantidad
         tablaRecetaMedica.getColumnModel().getColumn(3).setPreferredWidth(80);  // Duración
         tablaRecetaMedica.getColumnModel().getColumn(4).setPreferredWidth(250); // Indicaciones
-        tablaRecetaMedica.getColumnModel().getColumn(5).setPreferredWidth(100); // Acciones
+        tablaRecetaMedica.getColumnModel().getColumn(5).setPreferredWidth(100);// Estado
+        tablaRecetaMedica.getColumnModel().getColumn(6).setPreferredWidth(80);// Acciones
 
         JScrollPane scrollPane = new JScrollPane(tablaRecetaMedica);
         scrollPane.setPreferredSize(new Dimension(0, 200));
@@ -375,7 +381,7 @@ public class PrescripcionView {
                                 medicamentoSeleccionado,
                                 detalleDialog.getCantidad(),
                                 detalleDialog.getDuracion(),
-                                detalleDialog.getIndicaciones()
+                                detalleDialog.getIndicaciones(),detalleDialog.getEstado()
                         );
                     }
                 }
@@ -390,6 +396,13 @@ public class PrescripcionView {
     }
 
     private void guardarReceta() {
+        if (medicoActual == null) {
+            JOptionPane.showMessageDialog(panelContenido,
+                    "Error: No hay médico asignado. Por favor, reinicie la sesión.",
+                    "Error",
+                    JOptionPane.ERROR_MESSAGE);
+            return;
+        }
         if (modeloTabla.getRowCount() == 0) {
             JOptionPane.showMessageDialog(panelContenido,
                     "Debe agregar al menos un medicamento a la receta",
@@ -421,6 +434,8 @@ public class PrescripcionView {
                     String duracionTexto = (String) modeloTabla.getValueAt(i, 3);
                     int duracion = Integer.parseInt(duracionTexto.replace(" días", ""));
                     String indicaciones = (String) modeloTabla.getValueAt(i, 4);
+                    String estadoTexto = (String) modeloTabla.getValueAt(i, 5);
+                    PrescriptionState estado = parseEstadoFromString(estadoTexto);
 
                     // Buscar el medicamento completo para obtener el código
                     String codigoMedicamento = "";
@@ -441,7 +456,7 @@ public class PrescripcionView {
                             numeroReceta,           // numeroReceta
                             fechaHoy,              // fechaPrescripcion
                             fechaRetiro,           // fechaRetiro
-                            "MED001",              // medicoId (deberías obtenerlo del médico logueado)
+                            medicoActual.getID(),              // medicoId (deberías obtenerlo del médico logueado)
                             pacienteActual.getID(),        // pacienteId
                             pacienteActual.getNombre(),    // pacienteNombre
                             codigoMedicamento,     // codigoMedicamento
@@ -449,7 +464,8 @@ public class PrescripcionView {
                             presentacion,          // presentacion
                             cantidad,              // cantidad
                             duracion,              // duracionDias
-                            indicaciones           // indicaciones
+                            indicaciones,  // indicaciones
+                            estado
                     );
 
 
@@ -552,16 +568,20 @@ public class PrescripcionView {
     public DefaultTableModel getModeloTabla() {
         return modeloTabla;
     }
-
+    public void setMedicoActual(Medico medico) {
+        this.medicoActual = medico;
+        System.out.println("Médico establecido: " + (medico != null ? medico.getNombre() : "null"));
+    }
 
     public void agregarMedicamentoATabla(Medicamentos medicamento, int cantidad,
-                                         int duracion, String indicaciones) {
+                                         int duracion, String indicaciones, PrescriptionState estado) {
+        String estadoFormateado = formatStateName(estado);
         Object[] fila = {
                 medicamento.getNombre(),
                 medicamento.getPresentacion(),
                 cantidad,
                 duracion + " días",
-                indicaciones,
+                indicaciones,estadoFormateado,
                 "Eliminar"
         };
 
@@ -574,16 +594,39 @@ public class PrescripcionView {
         String fechaRetiro = extraerFechaRetiro((String) fechaRetiroBox.getSelectedItem());
 
         RecetaMedica receta = new RecetaMedica(
-                numeroReceta, fechaHoy, fechaRetiro, "MED001", // ID del médico
+                numeroReceta, fechaHoy, fechaRetiro, medicoActual.getID(), // ID del médico
                 pacienteActual.getID(), pacienteActual.getNombre(),
                 medicamento.getCodigo(), medicamento.getNombre(),
-                medicamento.getPresentacion(), cantidad, duracion, indicaciones
+                medicamento.getPresentacion(), cantidad, duracion, indicaciones,estado
         );
 
         medicamentosReceta.add(receta);
     }
 
-
+    private String formatStateName(PrescriptionState state) {
+        switch (state) {
+            case PENDING:
+                return "Pendiente";
+            case DISPENSED:
+                return "Despachado";
+            case EXPIRED:
+                return "Expirado";
+            default:
+                return state.toString();
+        }
+    }
+    private PrescriptionState parseEstadoFromString(String estadoTexto) {
+        switch (estadoTexto) {
+            case "Pendiente":
+                return PrescriptionState.PENDING;
+            case "Despachado":
+                return PrescriptionState.DISPENSED;
+            case "Expirado":
+                return PrescriptionState.EXPIRED;
+            default:
+                return PrescriptionState.PENDING;
+        }
+    }
     public void eliminarMedicamentoDeLaTabla(int fila) {
         if (fila >= 0 && fila < modeloTabla.getRowCount()) {
             modeloTabla.removeRow(fila);
