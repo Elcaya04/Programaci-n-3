@@ -5,6 +5,7 @@ import org.example.domain_layer.Medico;
 import org.example.domain_layer.Paciente;
 import org.example.domain_layer.RecetaMedica;
 import presentation_layer.Controllers.MedicamentosController;
+import presentation_layer.Controllers.PacienteController;
 import presentation_layer.Controllers.PrescipcionController;
 import presentation_layer.Controllers.RecetaMedicaController;
 import presentation_layer.Models.MedicamentoTableModel;

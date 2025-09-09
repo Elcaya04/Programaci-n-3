@@ -296,5 +296,6 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
             e.printStackTrace();
         }
     }
+    //Finalizado, faltan pruebas
 
 }

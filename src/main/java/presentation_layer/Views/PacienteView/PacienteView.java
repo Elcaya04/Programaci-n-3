@@ -1,6 +1,7 @@
 package presentation_layer.Views.PacienteView;
 
 import org.example.domain_layer.Paciente;
+import presentation_layer.Controllers.PacienteController;
 import presentation_layer.Models.PacienteTableModel;
 
 import javax.swing.*;
