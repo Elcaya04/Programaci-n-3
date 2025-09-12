@@ -77,7 +77,6 @@ public class PrescipcionController {
         }
     }
 
-    // Buscar medicamento usando la lógica que ya tienes
     public void buscarMedicamento(String nombre, JComponent parent) {
         try {
             if (nombre == null || nombre.isEmpty() || nombre.length() <= 3) {

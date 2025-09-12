@@ -4,6 +4,8 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import org.example.domain_layer.*;
 import presentation_layer.Controllers.*;
 import presentation_layer.Models.*;
+import presentation_layer.Views.AboutView.AboutView;
+
 import presentation_layer.Views.DespachoView.DespachoView;
 import presentation_layer.Views.FarmaceutaView.FarmaceutaView;
 import presentation_layer.Views.MainWindow.MainWindow;
@@ -41,6 +43,7 @@ public class Main {
     private static RecetasHistoricoView recetasHistoricoView;
     private static RecetasChartView recetasChartView;
     private static DespachoView despachoView;
+    private static AboutView acercaView;
     private static MainWindow mainWindow;
 
     // Diccionarios de tabs (manteniendo la estructura original)
@@ -51,6 +54,7 @@ public class Main {
     private static Dictionary<String, JPanel> tabs5;
     private static Dictionary<String, JPanel> tabs6;
     private static Dictionary<String, JPanel> tabs7;
+    private static Dictionary<String, JPanel> tabs8;
     //Para el usuario Logeado
     private static Object usuarioLogueado;
 //Funcion main donde se llaman todos los metodos para su ejecucion
@@ -180,6 +184,11 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         despachoView = new DespachoView(despachoController,null);
         tabs7 = new Hashtable<>();
         tabs7.put("Despacho", despachoView.getContentPanel());
+        //El acerca de view
+        acercaView=new AboutView();
+        tabs8= new Hashtable<>();
+        tabs8.put("Acerca de",acercaView.getPanel1());
+
 
         // Inicializar ventana principal
         mainWindow = new MainWindow();
@@ -211,26 +220,27 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
         switch (tipoUsuario) {
             case ADMINISTRADOR:
                 // El administrador puede ver todos los tabs
-                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5,tabs6,tabs7);
+                mainWindow.agregarTabs(tabs, tabs2, tabs3,tabs4, tabs5,tabs6,tabs7,tabs8);
                 break;
 
             case MEDICO:
-                // Los médicos pueden ver médicos y pacientes
+
                 Dictionary<String, JPanel> tabsVacios = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios2 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios3 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4 = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios7 = new Hashtable<>();
 
-                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5,tabs6,tabsVacios7);
+                mainWindow.agregarTabs(tabsVacios,tabsVacios2, tabsVacios3,tabsVacios4,tabs5,tabs6,tabsVacios7,tabs8);
                 break;
 
             case FARMACEUTA:
-                // Los farmaceutas pueden ver farmaceutas y pacientes
+
                 Dictionary<String, JPanel> tabsVacios2_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios4_ = new Hashtable<>();
                 Dictionary<String, JPanel> tabsVacios5 = new Hashtable<>();
-                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5,tabs6,tabs7);
+                Dictionary<String, JPanel> tabsVacios8 = new Hashtable<>();
+                mainWindow.agregarTabs(tabsVacios2_, tabs2, tabs3,tabsVacios4_, tabsVacios5,tabs6,tabs7,tabsVacios8);
                 break;
 
             default:
@@ -296,6 +306,6 @@ recetaMedicaService = new RecetaMedicaService(FileManagement.getRecetaMedicaFile
             e.printStackTrace();
         }
     }
-    //Finalizado, faltan pruebas
+    //Finalizado
 
 }
